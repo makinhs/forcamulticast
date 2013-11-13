@@ -5,7 +5,16 @@ import java.awt.Component;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import listener.BaseListener;
+
 public class BasePanel extends JPanel {
+
+    protected JFrame mainFrame;
+    protected BaseListener listener;
+
+    public BasePanel(JFrame mainFrame) {
+        this.mainFrame = mainFrame;
+    }
 
     /**
      * Método auxiliar responsável pelos eventos de troca de panel
@@ -24,4 +33,7 @@ public class BasePanel extends JPanel {
         frame.repaint();
     }
 
+    public JFrame getMainFrame() {
+        return mainFrame;
+    }
 }
