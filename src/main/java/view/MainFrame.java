@@ -22,6 +22,7 @@ public class MainFrame extends JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setTitle(GUIConstants.TITLE);
+        this.setLayout(null);
         //this.setLookAndFeel();
 
         JPanel telaInicial = new GUITelaInicial(this);
