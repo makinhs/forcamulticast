@@ -1,9 +1,14 @@
 package view;
 
+import java.awt.Color;
 import java.awt.Font;
 
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import listener.BaseListener;
@@ -18,6 +23,12 @@ public class GUILobby extends BasePanel {
     private JLabel labelJogadorAtual;
     private JLabel labelTituloLetrasChutadas;
     private JLabel labelLetrasChutadas;
+    private JTextField textFieldPalavra;
+    private JTextField textFieldMsgChat;
+    private JButton buttonChutar;
+    private JTextField buttonEnviar;
+    private JTextArea textAreaChat;
+    
 
     public GUILobby(JFrame mainFrame) {
         super(mainFrame);
@@ -48,6 +59,22 @@ public class GUILobby extends BasePanel {
         labelLetrasChutadas.setFont(new Font(null, Font.PLAIN, 12));
         labelLetrasChutadas.setBounds(10, 120, GUIConstants.FRAME_WIDTH / 2, GUIConstants.BASE_COMPONENT_HEIGHT);
         this.add(labelLetrasChutadas);
+        
+        textFieldPalavra = new JTextField();
+        textFieldPalavra.setBounds(10, GUIConstants.FRAME_HEIGHT - 80, 150, GUIConstants.BASE_COMPONENT_HEIGHT);
+        this.add(textFieldPalavra);
+        
+        buttonChutar = new JButton("Chutar Letra/Palavra");
+        buttonChutar.setFont(new Font(null, Font.PLAIN, 10));
+        buttonChutar.setBounds(10, GUIConstants.FRAME_HEIGHT - 60, 150, GUIConstants.BASE_COMPONENT_HEIGHT);
+        this.add(buttonChutar);
+        
+        textAreaChat = new JTextArea();
+        textAreaChat.setBounds(200, 290, 290, 50);
+        textAreaChat.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        this.add(textAreaChat);
+        
+        textFieldMsgChat = new JTextField();
     }
 
 }
