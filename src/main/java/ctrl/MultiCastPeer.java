@@ -13,7 +13,6 @@ public class MultiCastPeer extends Thread implements Serializable {
     private final String HOST = "229.0.0.50";
     private final int PORT = 5050;
     private final int TIMEOUT = 20000;
-    private static int USER = 0;
     private String usuario;
     private MulticastSocket socket;
     private InetAddress group;
@@ -24,8 +23,7 @@ public class MultiCastPeer extends Thread implements Serializable {
             socket = new MulticastSocket(PORT);
             socket.setSoTimeout(TIMEOUT);
             socket.joinGroup(group);
-            USER++;
-            usuario = "Usuario " + USER;
+            usuario = "Usuario " + (int) (Math.random() * 1000) % 10;
             this.start();
         } catch (UnknownHostException e) {
             System.out.println("Erro no host: " + e.getLocalizedMessage());
@@ -61,6 +59,11 @@ public class MultiCastPeer extends Thread implements Serializable {
      */
     public void enviarMensagem(String msg) {
         DatagramPacket msgOut = new DatagramPacket(msg.getBytes(), msg.getBytes().length, group, PORT);
+        try {
+            socket.send(msgOut);
+        } catch (IOException e) {
+            System.out.println("Erro I/O: " + e.getLocalizedMessage());
+        }
     }
 
     /**
