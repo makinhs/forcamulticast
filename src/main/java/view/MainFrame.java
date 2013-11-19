@@ -13,7 +13,7 @@ import util.GUIConstants;
 public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 1L;
-
+    
     public MainFrame() {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setSize(GUIConstants.FRAME_WIDTH, GUIConstants.FRAME_HEIGHT);
@@ -29,7 +29,7 @@ public class MainFrame extends JFrame {
         this.invalidate();
         this.repaint();
     }
-    
+
     private void setLookAndFeel() {
         try {
             for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {

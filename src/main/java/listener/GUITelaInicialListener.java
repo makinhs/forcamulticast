@@ -1,8 +1,8 @@
 package listener;
 
 import java.awt.Component;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import model.Jogador;
 
 import view.GUILobby;
 import view.GUITelaInicial;
@@ -23,6 +23,7 @@ public class GUITelaInicialListener extends BaseListener {
             if(username == null || username.isEmpty()) {
                 panel.getLabelErro().setText("O preenchimento do nick é obrigatório");
             } else {
+                new Jogador(username);
                 panel.changePanel(new GUILobby(panel.getMainFrame()));
             }
         }
