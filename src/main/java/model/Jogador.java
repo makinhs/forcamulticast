@@ -49,7 +49,7 @@ public class Jogador implements Serializable {
     public void addJogador(Jogador jogador) {
         boolean insere = true;
 
-        for (Jogador j : listaJogadores) {
+        for (Jogador j : getListaJogadores()) {
             if (jogador.getId().equals(j.getId())) {
                 insere = false;
                 break;
@@ -57,7 +57,7 @@ public class Jogador implements Serializable {
         }
 
         if (insere) {
-            listaJogadores.add(jogador);
+            getListaJogadores().add(jogador);
         }
     }
 
@@ -111,6 +111,10 @@ public class Jogador implements Serializable {
 
     public void setNick(String nick) {
         this.nick = nick;
+    }
+
+    public ArrayList<Jogador> getListaJogadores() {
+        return listaJogadores;
     }
 
 }
