@@ -11,10 +11,11 @@ import util.Serializer;
 
 public class Jogador implements Serializable {
 
-    private Integer id;
+    private int id;
     private String nick;
     private transient MultiCastPeer multicastConnection;
-    private transient boolean server;
+    private transient boolean server = false;
+    private transient boolean client = false;
     private transient ArrayList<Integer> idProcessos;
     private transient ArrayList<Jogador> listaJogadores;
     private transient int cont = 0;
@@ -28,12 +29,13 @@ public class Jogador implements Serializable {
         id = r.nextInt(10000);
         addIdJogadores(id);
         multicastConnection = new MultiCastPeer(this);
+        addJogador(this);
     }
 
     public void addIdJogadores(int id) {
         boolean insereId = true;
 
-        for (Integer idJogadores : idProcessos) {
+        for (int idJogadores : idProcessos) {
             if (idJogadores == id) {
                 insereId = false;
                 break;
@@ -50,7 +52,7 @@ public class Jogador implements Serializable {
         boolean insere = true;
 
         for (Jogador j : getListaJogadores()) {
-            if (jogador.getId().equals(j.getId())) {
+            if (jogador.getId() == (j.getId())) {
                 insere = false;
                 break;
             }
@@ -71,18 +73,22 @@ public class Jogador implements Serializable {
     }
 
     public void eleicao() {
-        int idJogadorEleito = idProcessos.get(0);
+        int idJogadorEleito = getListaJogadores().get(0).getId();
 
-        for (int i = 1; i < idProcessos.size(); i++) {
-            if (i > idJogadorEleito) {
-                idJogadorEleito = i;
-            }
+        for(int i=1; i<this.getListaJogadores().size(); i++)
+        {
+        	if(idJogadorEleito < getListaJogadores().get(i).getId())
+        	{
+        		idJogadorEleito = getListaJogadores().get(i).getId();
+        	}
         }
 
         if (this.getId() == idJogadorEleito) {
             server = true;
+            client = false;
         } else {
             server = false;
+            client = true;
         }
     }
 
@@ -97,11 +103,11 @@ public class Jogador implements Serializable {
 
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -117,4 +123,23 @@ public class Jogador implements Serializable {
         return listaJogadores;
     }
 
+	public boolean isServer() {
+		return server;
+	}
+
+	public void setServer(boolean server) {
+		this.server = server;
+	}
+
+	public boolean isClient() {
+		return client;
+	}
+
+	public void setClient(boolean client) {
+		this.client = client;
+	}
+    
+    
+
+    
 }

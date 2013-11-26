@@ -6,8 +6,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import model.Jogador;
 import util.Serializer;
 
@@ -21,6 +20,8 @@ public class MultiCastPeer extends Thread implements Serializable {
     private MulticastSocket socket;
     private InetAddress group;
     private Jogador jogador;
+    
+    int batata = 10;
 
     public MultiCastPeer(Jogador jogador) {
         try {
@@ -40,13 +41,42 @@ public class MultiCastPeer extends Thread implements Serializable {
     @Override
     public void run() {  
         while (!socket.isClosed()) {
-            if (this.jogador.getListaJogadores().size() < 4) {
+        	
+        	
+            if (this.jogador.getListaJogadores().size() < 4 || (!jogador.isClient() && !jogador.isServer())) {
                 this.adicionarJogadores();
+            }
+            else
+            {
+            	if(!jogador.isClient() && !jogador.isServer())
+            	{
+            		jogador.eleicao();
+            	}
+            	
+            	if(jogador.isServer())
+            	{
+            		inicializarServidorUDP();
+            	}
+            	
+            	if(jogador.isClient())
+            	{
+            		inicializarClienteUDP();
+            	}
             }
         }
     }
 
-    /**
+    private void inicializarClienteUDP() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void inicializarServidorUDP() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
      * Envia uma mensagem para o grupo multicast
      *
      * @param String msg
@@ -82,7 +112,7 @@ public class MultiCastPeer extends Thread implements Serializable {
                 System.out.println(((Jogador) o).getNick());
                 jogador.addJogador((Jogador) o);
             }
-            sleep(500);
+            sleep(1250);
             // enviarMensagem("Recebido por " + usuario);
         } catch (IOException e) {
             System.out.println("Erro I/O: " + e.getLocalizedMessage());

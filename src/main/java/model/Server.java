@@ -7,7 +7,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ctrl.ChaveLetraJogadorController;
 import ctrl.MultiCastPeer;
 
 public class Server {
@@ -81,40 +80,41 @@ public class Server {
 
 	private DatagramPacket controleJogo(ChaveLetraJogadorController chaveJogador) {
 		// TODO Auto-generated method stub
-		DatagramPacket replyPacket = null;
-		int idJogador = chaveJogador.getId();
-		if(jogadorDaVez.getId() == idJogador)
-		{
-
-			//verifica se o usuario tentou a palavra inteira
-			if(chaveJogador.getLetra().length()>1)
-			{
-				if(chaveJogador.getLetra().equals(palavraDaVez))
-				{
-					//acertou, fim
-					
-				}
-				else
-				{
-					
-					//fim, perdeu partida
-				}
-				
-				limparDados();
-			}
-			if(chaveJogador.getLetra().length()==1)
-			{
-				if(palavraDaVez.contains(chaveJogador.getLetra()))
-				{
-					
-				}
-			}
-			
-			//escolhe o proximo jogador (mesmo que tenha passado a palavra em branco)
-			jogadorDaVez = getJogadorDaVez();
-		}
+//		DatagramPacket replyPacket = null;
+//		int idJogador = chaveJogador.getId();
+//		if(jogadorDaVez.getId() == idJogador)
+//		{
+//
+//			//verifica se o usuario tentou a palavra inteira
+//			if(chaveJogador.getLetra().length()>1)
+//			{
+//				if(chaveJogador.getLetra().equals(palavraDaVez))
+//				{
+//					//acertou, fim
+//					
+//				}
+//				else
+//				{
+//					
+//					//fim, perdeu partida
+//				}
+//				
+//				limparDados();
+//			}
+//			if(chaveJogador.getLetra().length()==1)
+//			{
+//				if(palavraDaVez.contains(chaveJogador.getLetra()))
+//				{
+//					
+//				}
+//			}
+//			
+//			//escolhe o proximo jogador (mesmo que tenha passado a palavra em branco)
+//			jogadorDaVez = getJogadorDaVez();
+//		}
 		
-		return replyPacket;
+//		return replyPacket;
+		return null;
 		
 	}
 
