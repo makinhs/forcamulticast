@@ -1,19 +1,23 @@
 package model;
 
 import ctrl.MultiCastPeer;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import util.Serializer;
 
-public class Jogador implements Serializable{
+public class Jogador implements Serializable {
 
     private Integer id;
     private String nick;
-    private MultiCastPeer multicastConnection;
+    private transient MultiCastPeer multicastConnection;
     private boolean server;
-    private ArrayList<Integer> idProcessos;
+    private transient ArrayList<Integer> idProcessos;
     private ArrayList<Jogador> listaJogadores;
-    private int cont = 0;
+    private transient int cont = 0;
 
     public Jogador(String nick) {
         this.nick = nick;
@@ -23,7 +27,6 @@ public class Jogador implements Serializable{
         Random r = new Random();
         id = r.nextInt(10000);
         addIdJogadores(id);
-        info();
         multicastConnection = new MultiCastPeer(this);
     }
 
@@ -42,7 +45,7 @@ public class Jogador implements Serializable{
             cont++;
         }
     }
-    
+
     public void addJogador(Jogador jogador) {
         boolean insere = true;
 
@@ -57,15 +60,11 @@ public class Jogador implements Serializable{
             listaJogadores.add(jogador);
         }
     }
-    
-    public boolean isDefinindoJogadores()
-    {
-        if(cont <4)
-        {
+
+    public boolean isDefinindoJogadores() {
+        if (cont < 4) {
             return true;
-        }
-        else
-        {
+        } else {
             eleicao();
             return false;
         }
@@ -79,18 +78,23 @@ public class Jogador implements Serializable{
                 idJogadorEleito = i;
             }
         }
-        
-        if(this.id == idJogadorEleito) 
+
+        if (this.id == idJogadorEleito) {
             server = true;
-        else 
+        } else {
             server = false;
+        }
     }
 
-    public void info() {
-        System.out.println("ID: " + this.id);
-        System.out.println("Nick: " + this.nick);
+    public byte[] sendInfo() {
+        try {
+            return Serializer.serialize(this);
+        } catch (IOException ex) {
+            System.out.println("Erro Serializacao obj Jogador: " + ex.getLocalizedMessage());
+            return null;
+        }
     }
-    
+
     public Integer getId() {
         return id;
     }
