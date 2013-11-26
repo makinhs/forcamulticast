@@ -43,6 +43,8 @@ public class MultiCastPeer extends Thread implements Serializable {
         while (!socket.isClosed()) {
             try {
                 socket.receive(msgIn);
+                
+                
                 String res = new String(msgIn.getData()).trim();
                // enviarMensagem("Recebido por " + usuario);
             } catch (IOException e) {
