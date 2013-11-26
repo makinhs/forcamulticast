@@ -47,9 +47,9 @@ public class MultiCastPeer extends Thread implements Serializable {
                 socket.receive(msgIn);
                 Object o = Serializer.deserialize(msgIn.getData());
                 if (o instanceof Jogador) {
-                    System.out.println("woah");
+                    System.out.println(((Jogador)o).getNick());
                 }
-                sleep(10000);
+                sleep(2000);
                 // enviarMensagem("Recebido por " + usuario);
             } catch (IOException e) {
                 System.out.println("Erro I/O: " + e.getLocalizedMessage());

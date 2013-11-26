@@ -14,9 +14,9 @@ public class Jogador implements Serializable {
     private Integer id;
     private String nick;
     private transient MultiCastPeer multicastConnection;
-    private boolean server;
+    private transient boolean server;
     private transient ArrayList<Integer> idProcessos;
-    private ArrayList<Jogador> listaJogadores;
+    private transient ArrayList<Jogador> listaJogadores;
     private transient int cont = 0;
 
     public Jogador(String nick) {
@@ -79,7 +79,7 @@ public class Jogador implements Serializable {
             }
         }
 
-        if (this.id == idJogadorEleito) {
+        if (this.getId() == idJogadorEleito) {
             server = true;
         } else {
             server = false;
@@ -88,14 +88,29 @@ public class Jogador implements Serializable {
 
     public byte[] sendInfo() {
         try {
+            String msg = this.getNick() + "|" + this.getId() ;
             return Serializer.serialize(this);
         } catch (IOException ex) {
-            System.out.println("Erro Serializacao obj Jogador: " + ex.getLocalizedMessage());
+            Logger.getLogger(Jogador.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+
     }
 
     public Integer getId() {
         return id;
     }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNick() {
+        return nick;
+    }
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
 }
