@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 
+import model.Client;
 import model.Jogador;
 import util.Serializer;
 
@@ -43,7 +44,7 @@ public class MultiCastPeer extends Thread implements Serializable {
         while (!socket.isClosed()) {
         	
         	
-            if (this.jogador.getListaJogadores().size() < 4 || (!jogador.isClient() && !jogador.isServer())) {
+            if (this.jogador.getListaJogadores().size() < 4) {
                 this.adicionarJogadores();
             }
             else
@@ -67,12 +68,53 @@ public class MultiCastPeer extends Thread implements Serializable {
     }
 
     private void inicializarClienteUDP() {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub    	
+    	
+    	//loop do jogo
+    	Client c = jogador.getClient();
+    	c.enviarChute(jogador.getNick() + "diz: teuCU");
+    	try {
+			sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
 	private void inicializarServidorUDP() {
 		// TODO Auto-generated method stub
+		
+		try {
+			sleep(3000);
+			//começa o server udp
+			jogador.getServer().startServer();
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+	}
+
+	private void mandaDadosServerMulticast() {
+		// TODO Auto-generated method stub
+		byte[] buffer = new byte[1024];
+		try
+		{
+			this.enviarMensagem(jogador.sendInfo());
+			sleep(1000);
+		}catch(Exception e)
+		{
+			
+		}finally
+		{
+			cleanBuffer(buffer);
+		}
+		
 		
 	}
 

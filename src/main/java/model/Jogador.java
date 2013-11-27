@@ -14,15 +14,18 @@ public class Jogador implements Serializable {
     private int id;
     private String nick;
     private transient MultiCastPeer multicastConnection;
-    private transient boolean server = false;
-    private transient boolean client = false;
+    private transient boolean isServer = false;
+    private transient boolean isClient = false;
     private transient ArrayList<Integer> idProcessos;
     private transient ArrayList<Jogador> listaJogadores;
-    private transient int cont = 0;
+    private transient int cont = 0;           
+    private transient Server servidorUDP = null;
+    private transient Client clienteUDP = null;
+    
 
     public Jogador(String nick) {
         this.nick = nick;
-        this.server = false;
+        this.isServer = false;
         idProcessos = new ArrayList<Integer>();
         listaJogadores = new ArrayList<Jogador>();
         Random r = new Random();
@@ -84,11 +87,11 @@ public class Jogador implements Serializable {
         }
 
         if (this.getId() == idJogadorEleito) {
-            server = true;
-            client = false;
+            isServer = true;
+            isClient = false;
         } else {
-            server = false;
-            client = true;
+            isServer = false;
+            isClient = true;
         }
     }
 
@@ -124,21 +127,62 @@ public class Jogador implements Serializable {
     }
 
 	public boolean isServer() {
-		return server;
+		return isServer;
 	}
 
 	public void setServer(boolean server) {
-		this.server = server;
+		this.isServer = server;
 	}
 
 	public boolean isClient() {
-		return client;
+		return isClient;
 	}
 
 	public void setClient(boolean client) {
-		this.client = client;
+		this.isClient = client;
 	}
-    
+
+	public Server getServer() {
+		// TODO Auto-generated method stub
+		if(isServer)
+		{
+			if(servidorUDP == null)
+			{
+				servidorUDP = new Server(getListaJogadores(), multicastConnection);
+			}			
+			
+			return servidorUDP;			
+		}
+		return null;
+	}
+	
+	public Client getClient()
+	{
+		if(isClient)
+		{
+			if(clienteUDP == null)
+			{
+				clienteUDP = new Client(getServidorAddress());
+			}
+			
+			return clienteUDP;
+		}
+		return null;
+	}
+
+	private String getServidorAddress() {
+		String address = "";
+		for(Jogador j : getListaJogadores())
+		{
+			if(j.isServer())
+			{
+				address = j.getServer().getAddress();
+				break;
+			}
+		}
+		return address;
+	}
+
     
 
     

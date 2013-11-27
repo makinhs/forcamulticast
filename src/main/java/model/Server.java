@@ -52,26 +52,32 @@ public class Server {
 		return jogadorDaVez;
 	}
 	
-	public void executar()
+	public void startServer()
 	{
 		DatagramSocket aSocket = null;
 		ChaveLetraJogadorController chaveJogador = null;
 		try{
-	    	aSocket = new DatagramSocket(6789);
-					// create socket at agreed port
-			byte[] buffer = new byte[1000];
+	    	
  			while(true){
+ 				System.out.println("server inicializado");
+ 				aSocket = new DatagramSocket(6789);
+				// create socket at agreed port
+ 				byte[] buffer = new byte[1000];
  				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
   				aSocket.receive(request); 
   				
+  				System.out.println(new String(request.getData()));
+  				  				
+  						
+  				
   				//chaveJogador = (Cha,,)request;
-  				controleJogo(chaveJogador);  				
+//  				controleJogo(chaveJogador);  				
   				
   				
   				
     			//DatagramPacket reply = new DatagramPacket(request.getData(), request.getLength(), 
     			//	request.getAddress(), request.getPort());
-    			aSocket.send(controleJogo(chaveJogador));
+//    			aSocket.send(controleJogo(chaveJogador));
     		}
 		}catch (SocketException e){System.out.println("Socket: " + e.getMessage());
 		}catch (IOException e) {System.out.println("IO: " + e.getMessage());
@@ -132,6 +138,13 @@ public class Server {
 		contPalavra++;
 		return palavrasController.getPalavras().get(contPalavra);
 		
+	}
+
+
+
+	public String getAddress() {
+		// TODO Auto-generated method stub
+		return "localhost";
 	}
 	
 	
