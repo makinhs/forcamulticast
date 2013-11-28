@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 
 import model.Client;
 import model.Jogador;
+import util.Parameter;
 import util.Serializer;
 
 public class MultiCastPeer extends Thread implements Serializable {
@@ -21,6 +22,9 @@ public class MultiCastPeer extends Thread implements Serializable {
     private MulticastSocket socket;
     private InetAddress group;
     private Jogador jogador;
+    private boolean isPrivateKeyRecieved = false;
+    private int contHelloEmMs = 0;
+    private boolean isServerUp = true;
     
     int batata = 10;
 
@@ -73,32 +77,90 @@ public class MultiCastPeer extends Thread implements Serializable {
     	//loop do jogo
     	Client c = jogador.getClient();
     	
-
-    	for(Jogador j : jogador.getListaJogadores())
+    	
+    	//verifica se o server estiver UP ainda após Delta T1.
+    	if((contHelloEmMs >= Parameter.DELTA_T1_SERVER_MANDAR_HELLO))
     	{
-    		if(j.getServer() == null)
+    		
+    		//verifica se o server está online
+    		isServerUp = isServerUP();
+    		if(!isServerUp)
     		{
-    			
+    			//se não estiver, limpa a lista
+    			jogador.getListaJogadores().clear();
     		}
-    		else
+    		contHelloEmMs = 0;
+    	}    	
+    	else
+    	{    	
+    		if(isServerUp)
     		{
-    			if(j.getServer().isLoopGetPrivateKey())
-    			{
-    				c.enviarChavePrivada();
-    			}
+		    	if(!isPrivateKeyRecieved)
+		    	{
+		    		c.enviarChavePrivada();
+		    		isAllPrivateKeyRecieved();
+		    	}
+		    	c.enviarChute(jogador.getNick() + "diz: teuCU");
+		    	try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     		}
     	}
-   			    	
-
     	
-    	c.enviarChute(jogador.getNick() + "diz: teuCU");
     	try {
-			sleep(1000);
+			sleep(50);
+			contHelloEmMs+=50;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	}
+
+	private boolean isServerUP() {
+		 byte[] buffer = new byte[1024];
+	        DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
+	        try {
+//	            this.enviarMensagem(jogador.sendInfo());
+	            socket.receive(msgIn);
+	            String mensagem = new String(msgIn.getData());
+	            
+	            
+	                if(mensagem.equals("hello"))                
+	                {
+	                	return true;
+	                }
+//	                sleep(50);
+	        }catch(Exception e)
+	        {
+	        	
+	        }	
+		return false;
+	}
+
+	private void isAllPrivateKeyRecieved() {
+//		for(int i =0; i<10; i++)
+		{
+	        byte[] buffer = new byte[1024];
+	        DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
+	        try {
+//	            this.enviarMensagem(jogador.sendInfo());
+	            socket.receive(msgIn);
+	            String mensagem = new String(msgIn.getData());
+	            
+	            
+	                if(mensagem.equals(Parameter.CHAVES_PRIVADAS_RECEBIDAS))                
+	                {
+	                	isPrivateKeyRecieved = true;
+	                }
+//	                sleep(50);
+	        }catch(Exception e)
+	        {
+	        	
+	        }	
+		}
 	}
 
 	private void inicializarServidorUDP() {
@@ -191,4 +253,18 @@ public class MultiCastPeer extends Thread implements Serializable {
             cleanBuffer(buffer);
         }
     }
+
+	public void enviarAvisoPrivadasFim(byte[] msg) {
+		for(int i=0; i<10; i++)
+		{
+		 DatagramPacket msgOut = new DatagramPacket(msg, msg.length, group, PORT);
+		 System.out.println(new String(msg));
+	        try {
+	            socket.send(msgOut);
+	            sleep(50);
+	        } catch (IOException | InterruptedException e) {
+	            System.out.println("Erro I/O: " + e.getLocalizedMessage());
+	        }
+		}
+	}
 }

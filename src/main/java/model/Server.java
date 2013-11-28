@@ -25,7 +25,8 @@ public class Server {
 	private ArrayList<String> palavraTentada = new ArrayList<String>();
 	private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
 	private boolean loopGetPrivateKey = true;
-	private boolean loopMainGame = true;
+	private boolean loopMainGame = false;
+	private int contLoopStillAlive = 0;
 	
 	
 
@@ -41,7 +42,12 @@ public class Server {
 	public boolean isLoopGetPrivateKey() {
 		return loopGetPrivateKey;
 	}
-
+	
+	
+	public void addContLoop()
+	{
+		contLoopStillAlive+=88;
+	}
 	
 	
 	public boolean isLoopMainGame() {
@@ -80,6 +86,7 @@ public class Server {
 			
 	    	
  			while(loopGetPrivateKey){
+ 				mandarMensagemHello();
  				System.out.println("recebendo chaves privadas");
  				aSocket = new DatagramSocket(6789);
 				// create socket at agreed port
@@ -105,6 +112,8 @@ public class Server {
 				if(chavesPrivadas.size() == 3)
 				{
 					loopGetPrivateKey = false;
+					loopMainGame = true;
+					mCast.enviarAvisoPrivadasFim(Parameter.CHAVES_PRIVADAS_RECEBIDAS.getBytes());
 				}
   				
   				System.out.println("Lista de chaves privadas: " + chavesPrivadas.size());
@@ -120,6 +129,18 @@ public class Server {
 
 	
 	
+	private void mandarMensagemHello() {
+		// TODO Auto-generated method stub
+		addContLoop();
+		String hello = "hello";
+		if(contLoopStillAlive >= Parameter.DELTA_T1_SERVER_MANDAR_HELLO)
+		{
+			mCast.enviarMensagem(hello.getBytes());
+			contLoopStillAlive = 0;
+		}
+		
+	}
+
 	private void adicionaChavePrivada(Object o) {
 		
 		
@@ -139,6 +160,7 @@ public class Server {
 			
 	    	
  			while(isJogoLoop){
+ 				mandarMensagemHello();
  				System.out.println("server inicializado");
  				aSocket = new DatagramSocket(6789);
 				// create socket at agreed port
@@ -146,7 +168,7 @@ public class Server {
  				DatagramPacket request = new DatagramPacket(buffer, buffer.length);
   				aSocket.receive(request); 
   				
-  				System.out.println(new String(request.getData()));
+//  				System.out.println(new String(request.getData()));
   				  				
   				
   						
