@@ -45,7 +45,7 @@ public class MultiCastPeer extends Thread implements Serializable {
         	
         	
             if (this.jogador.getListaJogadores().size() < 4) {
-                this.adicionarJogadores();
+                this.adicionarJogadores();                
             }
             else
             {
@@ -72,6 +72,25 @@ public class MultiCastPeer extends Thread implements Serializable {
     	
     	//loop do jogo
     	Client c = jogador.getClient();
+    	
+
+    	for(Jogador j : jogador.getListaJogadores())
+    	{
+    		if(j.getServer() == null)
+    		{
+    			
+    		}
+    		else
+    		{
+    			if(j.getServer().isLoopGetPrivateKey())
+    			{
+    				c.enviarChavePrivada();
+    			}
+    		}
+    	}
+   			    	
+
+    	
     	c.enviarChute(jogador.getNick() + "diz: teuCU");
     	try {
 			sleep(1000);
@@ -88,7 +107,14 @@ public class MultiCastPeer extends Thread implements Serializable {
 		try {
 			sleep(3000);
 			//começa o server udp
-			jogador.getServer().startServer();
+			if(jogador.getServer().isLoopGetPrivateKey())
+			{
+				jogador.getServer().getChavesPrivadas();
+			}
+			if(jogador.getServer().isLoopMainGame())
+			{
+				jogador.getServer().startJogo();
+			}
 
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -151,8 +177,7 @@ public class MultiCastPeer extends Thread implements Serializable {
             socket.receive(msgIn);
             Object o = Serializer.deserialize(msgIn.getData());
             if (o instanceof Jogador) {
-                System.out.println(((Jogador) o).getNick());
-                jogador.addJogador((Jogador) o);
+                jogador.addJogador((Jogador) o);                
             }
             sleep(1250);
             // enviarMensagem("Recebido por " + usuario);

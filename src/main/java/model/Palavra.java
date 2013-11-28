@@ -13,7 +13,7 @@ public class Palavra {
 
 	private void preenchePalavras() {
 		palavras.add("banana");
-		
+		palavras.add("polenta");
 	}
 
 	public ArrayList<String> getPalavras() {

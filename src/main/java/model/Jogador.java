@@ -1,130 +1,170 @@
 package model;
 
-import ctrl.MultiCastPeer;
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import util.Serializer;
+import ctrl.MultiCastPeer;
 
 public class Jogador implements Serializable {
 
-    private int id;
-    private String nick;
-    private transient MultiCastPeer multicastConnection;
-    private transient boolean isServer = false;
-    private transient boolean isClient = false;
-    private transient ArrayList<Integer> idProcessos;
-    private transient ArrayList<Jogador> listaJogadores;
-    private transient int cont = 0;           
-    private transient Server servidorUDP = null;
-    private transient Client clienteUDP = null;
-    
+	private int id;
+	private String nick;
+	private transient MultiCastPeer multicastConnection;
+	private transient boolean isServer = false;
+	private transient boolean isClient = false;
+	private transient ArrayList<Integer> idProcessos;
+	private transient ArrayList<Jogador> listaJogadores;
+	private transient int cont = 0;
+	private transient Server servidorUDP = null;
+	private transient Client clienteUDP = null;
 
-    public Jogador(String nick) {
-        this.nick = nick;
-        this.isServer = false;
-        idProcessos = new ArrayList<Integer>();
-        listaJogadores = new ArrayList<Jogador>();
-        Random r = new Random();
-        id = r.nextInt(10000);
-        addIdJogadores(id);
-        multicastConnection = new MultiCastPeer(this);
-        addJogador(this);
-    }
+	private transient PrivateKey chavePrivada;
+	private PublicKey chavePublica;
 
-    public void addIdJogadores(int id) {
-        boolean insereId = true;
+	public Jogador(String nick) {
+		this.inicializaChave();
+		this.nick = nick;
+		this.isServer = false;
+		idProcessos = new ArrayList<Integer>();
+		listaJogadores = new ArrayList<Jogador>();
+		Random r = new Random();
+		id = r.nextInt(10000);
+		addIdJogadores(id);
+		multicastConnection = new MultiCastPeer(this);
+		addJogador(this);
 
-        for (int idJogadores : idProcessos) {
-            if (idJogadores == id) {
-                insereId = false;
-                break;
-            }
-        }
+	}
 
-        if (insereId) {
-            idProcessos.add(id);
-            cont++;
-        }
-    }
+	public void addIdJogadores(int id) {
+		boolean insereId = true;
 
-    public void addJogador(Jogador jogador) {
-        boolean insere = true;
+		for (int idJogadores : idProcessos) {
+			if (idJogadores == id) {
+				insereId = false;
+				break;
+			}
+		}
 
-        for (Jogador j : getListaJogadores()) {
-            if (jogador.getId() == (j.getId())) {
-                insere = false;
-                break;
-            }
-        }
+		if (insereId) {
+			idProcessos.add(id);
+			cont++;
+		}
+	}
 
-        if (insere) {
-            getListaJogadores().add(jogador);
-        }
-    }
+	private void inicializaChave() {
+		ChaveSeguranca chave = new ChaveSeguranca();
+		chavePrivada = chave.getPriv();
+		chavePublica = chave.getPub();
+	}
 
-    public boolean isDefinindoJogadores() {
-        if (cont < 4) {
-            return true;
-        } else {
-            eleicao();
-            return false;
-        }
-    }
+	public byte[] getPrivateKey() {
+		try {
+			return Serializer.serialize(chavePrivada);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-    public void eleicao() {
-        int idJogadorEleito = getListaJogadores().get(0).getId();
+	public byte[] getPublicKey() {
+		try {
+			return Serializer.serialize(chavePublica);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
 
-        for(int i=1; i<this.getListaJogadores().size(); i++)
-        {
-        	if(idJogadorEleito < getListaJogadores().get(i).getId())
-        	{
-        		idJogadorEleito = getListaJogadores().get(i).getId();
-        	}
-        }
+	public PrivateKey getChavePrivada() {
+		return chavePrivada;
+	}
 
-        if (this.getId() == idJogadorEleito) {
-            isServer = true;
-            isClient = false;
-        } else {
-            isServer = false;
-            isClient = true;
-        }
-    }
+	public PublicKey getChavePublica() {
+		return chavePublica;
+	}
 
-    public byte[] sendInfo() {
-        try {
-            String msg = this.getNick() + "|" + this.getId() ;
-            return Serializer.serialize(this);
-        } catch (IOException ex) {
-            Logger.getLogger(Jogador.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+	public void addJogador(Jogador jogador) {
+		boolean insere = true;
 
-    }
+		for (Jogador j : getListaJogadores()) {
+			if (jogador.getId() == (j.getId())) {
+				insere = false;
+				break;
+			}
+		}
 
-    public int getId() {
-        return id;
-    }
+		if (insere) {
+			getListaJogadores().add(jogador);
+		}
+	}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	public boolean isDefinindoJogadores() {
+		if (cont < 4) {
+			return true;
+		} else {
+			eleicao();
+			return false;
+		}
+	}
 
-    public String getNick() {
-        return nick;
-    }
+	public void eleicao() {
+		int idJogadorEleito = getListaJogadores().get(0).getId();
 
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
+		for (int i = 1; i < this.getListaJogadores().size(); i++) {
+			if (idJogadorEleito < getListaJogadores().get(i).getId()) {
+				idJogadorEleito = getListaJogadores().get(i).getId();
+			}
+		}
 
-    public ArrayList<Jogador> getListaJogadores() {
-        return listaJogadores;
-    }
+		if (this.getId() == idJogadorEleito) {
+			isServer = true;
+			isClient = false;
+		} else {
+			isServer = false;
+			isClient = true;
+		}
+	}
+
+	public byte[] sendInfo() {
+		try {
+			String msg = this.getNick() + "|" + this.getId();
+			return Serializer.serialize(this);
+		} catch (IOException ex) {
+			Logger.getLogger(Jogador.class.getName()).log(Level.SEVERE, null,
+					ex);
+			return null;
+		}
+
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getNick() {
+		return nick;
+	}
+
+	public void setNick(String nick) {
+		this.nick = nick;
+	}
+
+	public ArrayList<Jogador> getListaJogadores() {
+		return listaJogadores;
+	}
 
 	public boolean isServer() {
 		return isServer;
@@ -144,27 +184,24 @@ public class Jogador implements Serializable {
 
 	public Server getServer() {
 		// TODO Auto-generated method stub
-		if(isServer)
-		{
-			if(servidorUDP == null)
-			{
-				servidorUDP = new Server(getListaJogadores(), multicastConnection);
-			}			
-			
-			return servidorUDP;			
+		if (isServer) {
+			if (servidorUDP == null) {
+				getListaJogadores().remove(this);
+				servidorUDP = new Server(getListaJogadores(),
+						multicastConnection);
+			}
+
+			return servidorUDP;
 		}
 		return null;
 	}
-	
-	public Client getClient()
-	{
-		if(isClient)
-		{
-			if(clienteUDP == null)
-			{
-				clienteUDP = new Client(getServidorAddress());
+
+	public Client getClient() {
+		if (isClient) {
+			if (clienteUDP == null) {
+				clienteUDP = new Client(getServidorAddress(), this);
 			}
-			
+
 			return clienteUDP;
 		}
 		return null;
@@ -172,10 +209,8 @@ public class Jogador implements Serializable {
 
 	private String getServidorAddress() {
 		String address = "";
-		for(Jogador j : getListaJogadores())
-		{
-			if(j.isServer())
-			{
+		for (Jogador j : getListaJogadores()) {
+			if (j.isServer()) {
 				address = j.getServer().getAddress();
 				break;
 			}
@@ -183,7 +218,4 @@ public class Jogador implements Serializable {
 		return address;
 	}
 
-    
-
-    
 }
