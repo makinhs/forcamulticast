@@ -163,19 +163,6 @@ public class MultiCastPeer extends Thread implements Serializable {
 
     }
 
-    private void mandaDadosServerMulticast() {
-        // TODO Auto-generated method stub
-        byte[] buffer = new byte[1024];
-        try {
-            this.enviarMensagem(jogador.sendInfo());
-            sleep(1000);
-        } catch (Exception e) {
-
-        } finally {
-            cleanBuffer(buffer);
-        }
-
-    }
 
     /**
      * Envia uma mensagem para o grupo multicast
