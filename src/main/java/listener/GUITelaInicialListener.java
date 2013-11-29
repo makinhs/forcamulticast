@@ -23,8 +23,8 @@ public class GUITelaInicialListener extends BaseListener {
             if(username == null || username.isEmpty()) {
                 panel.getLabelErro().setText("O preenchimento do nick é obrigatório");
             } else {
-                new Jogador(username);
-                panel.changePanel(new GUILobby(panel.getMainFrame()));
+                Jogador j = new Jogador(username);
+                panel.changePanel(new GUILobby(panel.getMainFrame(), j));
             }
         }
     }

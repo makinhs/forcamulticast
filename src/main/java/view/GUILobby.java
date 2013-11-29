@@ -7,13 +7,13 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants; 
+import javax.swing.SwingConstants;
 
 import listener.BaseListener;
 import listener.GUILobbyListener;
+import model.Jogador;
 import util.GUIConstants;
 
 public class GUILobby extends BasePanel {
@@ -29,9 +29,11 @@ public class GUILobby extends BasePanel {
     private JButton buttonChutar;
     private JButton buttonEnviar;
     private JTextArea textAreaChat;
+    private Jogador jogador;
 
-    public GUILobby(JFrame mainFrame) {
+    public GUILobby(JFrame mainFrame, Jogador jogador) {
         super(mainFrame);
+        this.jogador = jogador;
         listener = new GUILobbyListener(this);
         this.setSize(GUIConstants.FRAME_WIDTH, GUIConstants.FRAME_HEIGHT);
         this.setVisible(true);
@@ -67,26 +69,49 @@ public class GUILobby extends BasePanel {
         buttonChutar = new JButton("Chutar Letra/Palavra");
         buttonChutar.setFont(new Font(null, Font.PLAIN, 10));
         buttonChutar.setBounds(10, GUIConstants.FRAME_HEIGHT - 60, 150, GUIConstants.BASE_COMPONENT_HEIGHT);
+        buttonChutar.addActionListener(listener);
         this.add(buttonChutar);
 
-        textAreaChat = new JTextArea();
-//        JScrollPane scroll = new JScrollPane(textAreaChat, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-//        scroll.setViewportView(textAreaChat);
-        textAreaChat.setBounds(200, 285, 290, 50);
-        textAreaChat.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-       // textAreaChat.setEditable(false);
-        textAreaChat.setWrapStyleWord(true);
-//        this.add(scroll);
-        this.add(textAreaChat);
+    }
 
-        textFieldMsgChat = new JTextField();
-        textFieldMsgChat.setBounds(200, GUIConstants.FRAME_HEIGHT - 60, 200, 20);
-        textFieldMsgChat.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        this.add(textFieldMsgChat);
+    public JLabel getLabelPalavra() {
+        return labelPalavra;
+    }
 
-        buttonEnviar = new JButton("Enviar");
-        buttonEnviar.setBounds(405, GUIConstants.FRAME_HEIGHT - 60, 85, 20);
-        this.add(buttonEnviar);
+    public JLabel getLabelJogadorAtual() {
+        return labelJogadorAtual;
+    }
+
+    public JLabel getLabelTituloLetrasChutadas() {
+        return labelTituloLetrasChutadas;
+    }
+
+    public JLabel getLabelLetrasChutadas() {
+        return labelLetrasChutadas;
+    }
+
+    public JTextField getTextFieldPalavra() {
+        return textFieldPalavra;
+    }
+
+    public JTextField getTextFieldMsgChat() {
+        return textFieldMsgChat;
+    }
+
+    public JButton getButtonChutar() {
+        return buttonChutar;
+    }
+
+    public JButton getButtonEnviar() {
+        return buttonEnviar;
+    }
+
+    public JTextArea getTextAreaChat() {
+        return textAreaChat;
+    }
+
+    public Jogador getJogador() {
+        return jogador;
     }
 
 }

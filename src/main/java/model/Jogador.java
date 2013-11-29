@@ -24,7 +24,6 @@ public class Jogador implements Serializable {
 	private transient int cont = 0;
 	private transient Server servidorUDP = null;
 	private transient Client clienteUDP = null;
-
 	private transient PrivateKey chavePrivada;
 	private PublicKey chavePublica;
 
@@ -39,7 +38,6 @@ public class Jogador implements Serializable {
 		addIdJogadores(id);
 		multicastConnection = new MultiCastPeer(this);
 		addJogador(this);
-
 	}
 
 	public void addIdJogadores(int id) {

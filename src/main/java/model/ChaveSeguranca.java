@@ -11,47 +11,33 @@ import java.util.logging.Logger;
 import javax.crypto.Cipher;
 
 public class ChaveSeguranca {
-	private PrivateKey priv;
-	private PublicKey pub;
 
-	private final static String ALGORITMO = "DSA";
+    private PrivateKey priv;
+    private PublicKey pub;
 
-	public ChaveSeguranca() {
-		try {
+    private final static String ALGORITMO = "DSA";
 
-			final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(
-					ALGORITMO, "SUN");
-			final SecureRandom random = SecureRandom.getInstance("SHA1PRNG",
-					"SUN");
-			keyGen.initialize(1024, random);
-			KeyPair pair = keyGen.generateKeyPair();
-			this.priv = pair.getPrivate();
-			this.pub = pair.getPublic();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+    public ChaveSeguranca() {
+        try {
 
-	}
+            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITMO, "SUN");
+            final SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            keyGen.initialize(1024, random);
+            KeyPair pair = keyGen.generateKeyPair();
+            this.priv = pair.getPrivate();
+            this.pub = pair.getPublic();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-	public static byte[] encriptarComChavePrivada(String mensagem, PrivateKey privada) {
-		byte[] cipherData = null;
-		try {
-			Cipher cipher = Cipher.getInstance(ALGORITMO);
-			cipher.init(Cipher.ENCRYPT_MODE, privada);
-			cipherData = cipher.doFinal(mensagem.getBytes());
-		} catch (Exception ex) {
-			Logger.getLogger(Criptografia.class.getName()).log(Level.SEVERE,
-					null, ex);
-		}
-		return cipherData;
-	}
+    }
+    
+    public PrivateKey getPriv() {
+        return priv;
+    }
 
-	public PrivateKey getPriv() {
-		return priv;
-	}
-
-	public PublicKey getPub() {
-		return pub;
-	}
+    public PublicKey getPub() {
+        return pub;
+    }
 
 }

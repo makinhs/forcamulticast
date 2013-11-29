@@ -3,6 +3,7 @@ package listener;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
+import model.Jogador;
 import view.GUILobby;
 
 public class GUILobbyListener extends BaseListener {
@@ -16,7 +17,12 @@ public class GUILobbyListener extends BaseListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Component c = (Component) e.getSource();
-        System.out.println("Teste");
-
+        if (c.equals(panel.getButtonChutar())) {
+            Jogador j = panel.getJogador();
+            String s = panel.getTextFieldPalavra().getText();
+            if (j.isClient()) {
+                j.getClient().enviarChute(s);
+            }
+        }
     }
 }

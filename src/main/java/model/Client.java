@@ -8,6 +8,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
 
+import util.Criptografia;
+
 public class Client {
 
     private int port = 6789;
@@ -31,22 +33,21 @@ public class Client {
 
     public void enviarChute(String msg) {
         try {
-            DatagramPacket request = new DatagramPacket(msg.getBytes(), msg.getBytes().length, host, port);
+            //byte[] msgByte = Criptografia.encriptarComChavePrivada(msg.getBytes(), jogador.getChavePrivada());
+            byte[] msgByte = msg.getBytes();
+            DatagramPacket request = new DatagramPacket(msgByte, msgByte.length, host, port);
             socket.send(request);
         } catch (IOException ex) {
             System.out.println("Erro Envio: " + ex.getLocalizedMessage());
         }
     }
-    
-    public void enviarChavePrivada()
-    {
-    	try
-    	{    		
-    		DatagramPacket request = new DatagramPacket(jogador.getPrivateKey(), jogador.getPrivateKey().length, host, port);
+
+    public void enviarChavePrivada() {
+        try {
+            DatagramPacket request = new DatagramPacket(jogador.getPrivateKey(), jogador.getPrivateKey().length, host, port);
             socket.send(request);
-    	}catch(Exception e)
-    	{
-    		
-    	}
+        } catch (Exception e) {
+            System.out.println("Erro Envio chave privada: " + e.getLocalizedMessage());
+        }
     }
 }
