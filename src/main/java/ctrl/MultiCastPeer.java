@@ -65,7 +65,7 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
-    private void inicializarClienteUDP() {
+    private synchronized void inicializarClienteUDP() {
         // TODO Auto-generated method stub
 
         // loop do jogo
@@ -87,8 +87,9 @@ public class MultiCastPeer extends Thread implements Serializable {
                     c.enviarChavePrivada();
                     isAllPrivateKeyReceived();
                 }
+                
                 try {
-                    sleep(1000);
+                    sleep(50);
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -123,7 +124,7 @@ public class MultiCastPeer extends Thread implements Serializable {
         return false;
     }
 
-    private void isAllPrivateKeyReceived() {
+    private synchronized void isAllPrivateKeyReceived() {
         // for(int i =0; i<10; i++)
 
         byte[] buffer = new byte[1024];
@@ -146,8 +147,7 @@ public class MultiCastPeer extends Thread implements Serializable {
     private void inicializarServidorUDP() {
         // TODO Auto-generated method stub
 
-        try {
-            sleep(3000);
+
             // começa o server udp
             if (jogador.getServer().isLoopGetPrivateKey()) {
                 jogador.getServer().getChavesPrivadas();
@@ -155,11 +155,6 @@ public class MultiCastPeer extends Thread implements Serializable {
             if (jogador.getServer().isLoopMainGame()) {
                 jogador.getServer().startJogo();
             }
-
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
     }
 

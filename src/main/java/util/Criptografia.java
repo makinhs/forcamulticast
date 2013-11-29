@@ -7,10 +7,11 @@ import javax.crypto.Cipher;
 
 public class Criptografia {
 
-    private final static String ALGORITMO = "DSA";
+    private final static String ALGORITMO = "RSA";
 
     /**
      * Encripta array de bytes utilizando chave privada
+     *
      * @param mensagem
      * @param privateKey
      * @return byte[] contendo mensagem encriptada
@@ -26,9 +27,10 @@ public class Criptografia {
         }
         return cipherData;
     }
-    
+
     /**
      * Encripta array de bytes utilizando chave publica
+     *
      * @param mensagem
      * @param publicKey
      * @return byte[] contendo mensagem encriptada
@@ -56,5 +58,16 @@ public class Criptografia {
         }
         return cipherData;
     }
-    
+
+    public static byte[] decriptarComChavePublica(byte[] msgEncriptada, PublicKey publicKey) {
+        byte[] cipherData = null;
+        try {
+            Cipher cipher = Cipher.getInstance(ALGORITMO);
+            cipher.init(Cipher.DECRYPT_MODE, publicKey);
+            cipherData = cipher.doFinal(msgEncriptada);
+        } catch (Exception ex) {
+            System.out.println("Erro Encrypt com chave privada: " + ex.getLocalizedMessage());
+        }
+        return cipherData;
+    }
 }

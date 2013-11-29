@@ -7,8 +7,11 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import util.Criptografia;
+import util.Serializer;
 
 public class Client {
 
@@ -17,6 +20,7 @@ public class Client {
     private DatagramSocket socket;
     private InetAddress host;
     private Jogador jogador;
+    private boolean chaveEnviada = false;
 
     public Client(String ipAddress, Jogador jogador) {
         try {
@@ -33,12 +37,19 @@ public class Client {
 
     public void enviarChute(String msg) {
         try {
-            //byte[] msgByte = Criptografia.encriptarComChavePrivada(msg.getBytes(), jogador.getChavePrivada());
-            byte[] msgByte = msg.getBytes();
+            byte[] msgByte = Criptografia.encriptarComChavePrivada(Serializer.serialize(msg), jogador.getChavePrivada());
+            //byte[] msgByte = msg.getBytes();
             DatagramPacket request = new DatagramPacket(msgByte, msgByte.length, host, port);
             socket.send(request);
+            System.out.println("....");
+            Object o = Serializer.deserialize(Criptografia.decriptarComChavePublica(request.getData(), jogador.getChavePublica()));
+            if(o instanceof String) {
+                System.out.println(((String) o));
+            }
         } catch (IOException ex) {
             System.out.println("Erro Envio: " + ex.getLocalizedMessage());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -46,6 +57,8 @@ public class Client {
         try {
             DatagramPacket request = new DatagramPacket(jogador.getPrivateKey(), jogador.getPrivateKey().length, host, port);
             socket.send(request);
+            Random r = new Random();
+            Thread.sleep(r.nextInt(200));
         } catch (Exception e) {
             System.out.println("Erro Envio chave privada: " + e.getLocalizedMessage());
         }
