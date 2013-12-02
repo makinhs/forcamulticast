@@ -24,6 +24,7 @@ public class Server {
     private MultiCastPeer mCast;
     private ArrayList<String> palavraTentada = new ArrayList<String>();
     private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
+    private ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
     private boolean loopGetPrivateKey = true;
     private boolean loopMainGame = false;
     private int contLoopStillAlive = 0;
@@ -65,52 +66,8 @@ public class Server {
         return jogadorDaVez;
     }
 
-    public void getChavesPrivadas() {
-        DatagramSocket aSocket = null;
-        ChaveLetraJogadorController chaveJogador = null;
-
-        try {
-            while (loopGetPrivateKey) {
-                mandarMensagemHello();
-                System.out.println("recebendo chaves privadas");
-                aSocket = new DatagramSocket(6789);
-                // create socket at agreed port
-                byte[] buffer = new byte[1000];
-                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                aSocket.receive(request);
-
-                Object o;
-                try {
-                    o = Serializer.deserialize(request.getData());
-                    if (o instanceof PrivateKey) {
-                        PrivateKey privateKey = ((PrivateKey) o);
-                        if (!chavesPrivadas.contains(privateKey)) {
-                            chavesPrivadas.add(privateKey);
-                        }
-                    }
-                } catch (ClassNotFoundException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                if (chavesPrivadas.size() == 3) {
-                    loopGetPrivateKey = false;
-                    loopMainGame = true;
-                    mCast.enviarAvisoPrivadasFim(Parameter.CHAVES_PRIVADAS_RECEBIDAS.getBytes());
-                }
-
-                System.out.println("Lista de chaves privadas: " + chavesPrivadas.size());
-
-
-
-            }
-        } catch (SocketException e) {;
-        } catch (IOException e) {;
-        } finally {
-            if (aSocket != null) {
-                aSocket.close();
-            }
-        }
+    public ArrayList<PrivateKey> getChavesPrivadas() {
+    	return chavesPrivadas;
     }
 
     private void mandarMensagemHello() {
@@ -232,4 +189,20 @@ public class Server {
         // TODO Auto-generated method stub
         return Parameter.HOST_ADDRESS;
     }
+
+	public void setChavesPublicas(ArrayList<PublicKey> chavesPublicas) {
+		// TODO Auto-generated method stub
+		this.chavesPublicas = chavesPublicas;
+	}
+
+	public void setChavesPrivadas(ArrayList<PrivateKey> chavesPrivadas) {
+		// TODO Auto-generated method stub
+		this.chavesPrivadas = chavesPrivadas;
+	}
+
+	public ArrayList<PublicKey> getChavesPublicas() {
+		return chavesPublicas;
+	}
+	
+	
 }

@@ -26,9 +26,10 @@ public class Jogador implements Serializable {
 	private transient Client clienteUDP = null;
 	private transient PrivateKey chavePrivada;
 	private PublicKey chavePublica;
+	private boolean chavePublicaRecebida = false; 
+	private int porta = 0;
 
-	public Jogador(String nick) {
-		this.inicializaChave();
+	public Jogador(String nick) {		
 		this.nick = nick;
 		this.isServer = false;
 		idProcessos = new ArrayList<Integer>();
@@ -38,6 +39,9 @@ public class Jogador implements Serializable {
 		addIdJogadores(id);
 		multicastConnection = new MultiCastPeer(this);
 		addJogador(this);
+		
+		porta = 6000 + (int)(Math.random() * ((6999 - 6000) + 1));
+		
 	}
 
 	public void addIdJogadores(int id) {
@@ -55,12 +59,18 @@ public class Jogador implements Serializable {
 			cont++;
 		}
 	}
+	
+	
 
-	private void inicializaChave() {
-		ChaveSeguranca chave = new ChaveSeguranca();
-		chavePrivada = chave.getPriv();
-		chavePublica = chave.getPub();
+	public int getPorta() {
+		return porta;
 	}
+
+	public void setPorta(int porta) {
+		this.porta = porta;
+	}
+
+
 
 	public byte[] getPrivateKey() {
 		try {
@@ -214,6 +224,17 @@ public class Jogador implements Serializable {
 			}
 		}
 		return address;
+	}
+
+	public void setChavePublica(PublicKey publicKey) {
+		chavePublica = publicKey;
+		chavePublicaRecebida = true;
+		
+	}
+	
+	public boolean isChavePublicaRecebida()
+	{
+		return chavePublicaRecebida;
 	}
 
 }

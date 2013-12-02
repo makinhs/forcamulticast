@@ -8,7 +8,10 @@ import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 
 import model.Client;
+import model.ClienteSenderChave;
 import model.Jogador;
+import model.Server;
+import model.ServerRecebedorChave;
 import util.Parameter;
 import util.Serializer;
 
@@ -26,6 +29,9 @@ public class MultiCastPeer extends Thread implements Serializable {
     private int contHelloEmMs = 0;
     private boolean isServerUp = true;
 
+    private boolean myTurn = false;
+    private boolean enviaOuRecebeChave = true;
+    
     int batata = 10;
 
     public MultiCastPeer(Jogador jogador) {
@@ -83,17 +89,24 @@ public class MultiCastPeer extends Thread implements Serializable {
             contHelloEmMs = 0;
         } else {
             if (isServerUp) {
-                if (!isPrivateKeyReceived) {
-                    c.enviarChavePrivada();
-                    isAllPrivateKeyReceived();
-                }
-                
-                try {
-                    sleep(50);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+               //inicializa servidor UDP para receber as chaves do server do jogo
+            	if(enviaOuRecebeChave)
+            	{
+            		System.out.println("Inicializado server chave publica nick: "  + jogador.getNick());
+            		ServerRecebedorChave src = new ServerRecebedorChave(jogador.getPorta(), jogador);
+            		src.run();
+            		enviaOuRecebeChave = false;
+            	}
+            	else
+            	{
+            		if(jogador.getChavePublica() != null)
+            		{
+            			System.out.println(jogador.getNick());
+            			System.out.println(jogador.getChavePublica());
+            		}
+            	}
+            	
+            	
             }
         }
 
@@ -124,37 +137,49 @@ public class MultiCastPeer extends Thread implements Serializable {
         return false;
     }
 
-    private synchronized void isAllPrivateKeyReceived() {
-        // for(int i =0; i<10; i++)
-
-        byte[] buffer = new byte[1024];
-        DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
-        try {
-            // this.enviarMensagem(jogador.sendInfo());
-            socket.receive(msgIn);
-            String mensagem = new String(msgIn.getData());
-
-            if (mensagem.equals(Parameter.CHAVES_PRIVADAS_RECEBIDAS)) {
-                isPrivateKeyReceived = true;
-            }
-            // sleep(50);
-        } catch (Exception e) {
-
-        }
-
-    }
 
     private void inicializarServidorUDP() {
         // TODO Auto-generated method stub
 
-
+    	if(enviaOuRecebeChave)
+    	{
+    		try {
+	    		for(int i=0; i<20; i++)
+	    		{
+		    		ClienteSenderChave csc = new ClienteSenderChave(jogador, jogador.getServer());
+	//	    		System.out.println("cliente 1 inicializado");
+		    		csc.enviaChavePublica(jogador.getListaJogadores().get(0).getPorta(), 0);
+		    	
+						sleep(100);
+				
+		    		
+	//	    		System.out.println("cliente 2 inicializado");
+						csc = new ClienteSenderChave(jogador, jogador.getServer());
+		    		csc.enviaChavePublica(jogador.getListaJogadores().get(1).getPorta(), 1);
+		    		sleep(100);
+	//	    		System.out.println("cliente 3 inicializado");
+		    		
+		    		csc = new ClienteSenderChave(jogador, jogador.getServer());
+		    		csc.enviaChavePublica(jogador.getListaJogadores().get(2).getPorta(), 2);
+		    		sleep(100);
+	    		}
+    		} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		enviaOuRecebeChave = false;
+    	}
+    	else
+    	{
+    	
             // começa o server udp
-            if (jogador.getServer().isLoopGetPrivateKey()) {
-                jogador.getServer().getChavesPrivadas();
-            }
+//            if (jogador.getServer().isLoopGetPrivateKey()) {
+//                jogador.getServer().getChavesPrivadas();
+//            }
             if (jogador.getServer().isLoopMainGame()) {
                 jogador.getServer().startJogo();
             }
+    	}
 
     }
 
