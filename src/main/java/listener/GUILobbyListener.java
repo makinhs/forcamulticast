@@ -21,7 +21,15 @@ public class GUILobbyListener extends BaseListener {
             Jogador j = panel.getJogador();
             String s = panel.getTextFieldPalavra().getText();
             if (j.isClient()) {
-                j.getClient().enviarChute(s);
+//            	if(j.isJogadorDaVez())
+            	{
+            		j.getClient().enviarChute(s);
+            	}
+//            	else
+//            	{
+//            		System.out.println("Nao sou o jogador da vez");
+//            	}
+                
             }
         }
     }

@@ -48,7 +48,7 @@ public class GUILobby extends BasePanel {
         labelPalavra.setFont(new Font(null, Font.BOLD, 18));
         this.add(labelPalavra);
 
-        labelJogadorAtual = new JLabel("Vez de fulano");
+        labelJogadorAtual = new JLabel("Jogador: "+jogador.getNick());
         labelJogadorAtual.setBounds(10, 70, GUIConstants.FRAME_WIDTH / 2, GUIConstants.BASE_COMPONENT_HEIGHT);
         labelJogadorAtual.setFont(new Font(null, Font.PLAIN, 10));
         this.add(labelJogadorAtual);

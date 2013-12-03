@@ -37,20 +37,23 @@ public class Client {
 
     public void enviarChute(String msg) {
         try {
-            byte[] msgByte = Criptografia.encriptarComChavePrivada(Serializer.serialize(msg), jogador.getChavePrivada());
-            //byte[] msgByte = msg.getBytes();
+//            byte[] msgByte = Criptografia.encriptarComChavePrivada(Serializer.serialize(msg), jogador.getChavePrivada());
+            byte[] msgByte = Criptografia.encriptarComChavePublica(Serializer.serialize(msg), jogador.getChavePublica());
+//            byte[] msgByte = msg.getBytes();
+            
+            msgByte = msg.getBytes();
+            
             DatagramPacket request = new DatagramPacket(msgByte, msgByte.length, host, port);
-            socket.send(request);
-            System.out.println("....");
-            Object o = Serializer.deserialize(Criptografia.decriptarComChavePublica(request.getData(), jogador.getChavePublica()));
-            if(o instanceof String) {
-                System.out.println(((String) o));
-            }
+            socket.send(request);          
+//            Object o = Serializer.deserialize(Criptografia.decriptarComChavePublica(request.getData(), jogador.getChavePublica()));
+//            if(o instanceof String) {
+//                System.out.println(((String) o));
+//            }
         } catch (IOException ex) {
-            System.out.println("Erro Envio: " + ex.getLocalizedMessage());
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            System.out.println("Erro Envio: " + ex.getLocalizedMessage());}
+//        } catch (ClassNotFoundException ex) {
+//            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     public void enviarChavePrivada() {

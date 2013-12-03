@@ -101,8 +101,10 @@ public class MultiCastPeer extends Thread implements Serializable {
             	{
             		if(jogador.getChavePublica() != null)
             		{
-            			System.out.println(jogador.getNick());
-            			System.out.println(jogador.getChavePublica());
+            			if(isJogadorDaVez())
+            			{
+//            				jogador.getClient().enviarChute("teste");
+            			}
             		}
             	}
             	
@@ -173,12 +175,8 @@ public class MultiCastPeer extends Thread implements Serializable {
     	{
     	
             // começa o server udp
-//            if (jogador.getServer().isLoopGetPrivateKey()) {
-//                jogador.getServer().getChavesPrivadas();
-//            }
-            if (jogador.getServer().isLoopMainGame()) {
-                jogador.getServer().startJogo();
-            }
+           jogador.getServer().startJogo();
+            
     	}
 
     }
@@ -210,6 +208,41 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
+    
+    private boolean isJogadorDaVez() {
+        byte[] buffer = new byte[1024];
+        DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
+        try {
+            this.enviarMensagem(jogador.sendInfo());
+            socket.receive(msgIn);
+            
+            String jogadorDaVez = new String(msgIn.getData());
+            
+            if(jogadorDaVez != null)
+            {
+            	if(jogadorDaVez.equals("Jogador da vez: " + jogador.getNick()))
+            	{
+            		jogador.setJogadorDaVez(true);
+            		return true;
+            	}
+            }
+            
+//            Object o = Serializer.deserialize(msgIn.getData());
+//            if (o instanceof Jogador) {
+//                jogador.addJogador((Jogador) o);
+//            }
+//            sleep(1250);
+            // enviarMensagem("Recebido por " + usuario);
+        } catch (IOException e) {
+            System.out.println("Erro I/O: " + e.getLocalizedMessage());        
+        } finally {
+            cleanBuffer(buffer);
+        }
+        
+        jogador.setJogadorDaVez(false);
+        return false;
+    }
+    
     private void adicionarJogadores() {
         byte[] buffer = new byte[1024];
         DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);

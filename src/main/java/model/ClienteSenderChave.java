@@ -16,6 +16,8 @@ public class ClienteSenderChave {
 	
 	private Jogador jogador;
 	private Server server;
+	private ArrayList<PrivateKey> chavesPrivadas;
+	private ArrayList<PublicKey> chavesPublicas;
 	
 	public ClienteSenderChave(Jogador j, Server s) {
 		this.jogador = j;
@@ -25,8 +27,8 @@ public class ClienteSenderChave {
 	
 	public void inicializarChaves()
 	{
-		ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
-		ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
+		chavesPrivadas = new ArrayList<PrivateKey>();
+		chavesPublicas = new ArrayList<PublicKey>();
 		
 		for(int i=0; i<3; i++){
 			ChaveSeguranca chave = new ChaveSeguranca();
@@ -34,8 +36,8 @@ public class ClienteSenderChave {
 			chavesPublicas.add(chave.getPub());
 		}
 		
-		server.setChavesPublicas(chavesPublicas);
-		server.setChavesPrivadas(chavesPrivadas);
+//		server.setChavesPublicas(chavesPublicas);
+//		server.setChavesPrivadas(chavesPrivadas);
 		
 	}
 	
@@ -46,11 +48,19 @@ public class ClienteSenderChave {
 				try {
 					aSocket = new DatagramSocket();    
 					
-					byte [] m = Serializer.serialize(server.getChavesPublicas().get(cont));
+					byte [] m = Serializer.serialize(chavesPublicas.get(cont));
 					InetAddress aHost = InetAddress.getByName(Parameter.HOST_ADDRESS);					                                                
 					DatagramPacket request =
 					 	new DatagramPacket(m,  m.length, aHost, porta);
-					aSocket.send(request);			                        
+					aSocket.send(request);		
+					
+					for(Jogador jogador : server.getJogadores())
+					{
+						if(porta == jogador.getPorta())
+						{
+							server.addChavePublica(jogador.getNick(), chavesPublicas.get(cont), chavesPrivadas.get(cont));
+						}
+					}
 					
 //					System.out.println("Enviado chave cliente: " + jogador.getNick());
 					

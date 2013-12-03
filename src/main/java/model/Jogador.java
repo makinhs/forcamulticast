@@ -28,6 +28,7 @@ public class Jogador implements Serializable {
 	private PublicKey chavePublica;
 	private boolean chavePublicaRecebida = false; 
 	private int porta = 0;
+	public boolean isJogadorDaVez = false;
 
 	public Jogador(String nick) {		
 		this.nick = nick;
@@ -235,6 +236,17 @@ public class Jogador implements Serializable {
 	public boolean isChavePublicaRecebida()
 	{
 		return chavePublicaRecebida;
+	}
+
+	
+	public void setJogadorDaVez(boolean isJogadorVez)
+	{
+		this.isJogadorDaVez= isJogadorVez; 
+	}
+	
+	public boolean isJogadorDaVez() {
+		// TODO Auto-generated method stub
+		return isJogadorDaVez;
 	}
 
 }

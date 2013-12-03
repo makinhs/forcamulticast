@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import util.Criptografia;
 import util.Parameter;
 import util.Serializer;
 import ctrl.MultiCastPeer;
@@ -23,10 +24,13 @@ public class Server {
     private String palavraDaVez = "";
     private MultiCastPeer mCast;
     private ArrayList<String> palavraTentada = new ArrayList<String>();
-    private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
-    private ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
-    private boolean loopGetPrivateKey = true;
-    private boolean loopMainGame = false;
+//    private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
+//    private ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
+    
+    private HashMap<String, PublicKey> cPublicas = new HashMap<String, PublicKey>();
+    private HashMap<String, PrivateKey> cPrivadas = new HashMap<String, PrivateKey>();
+    
+    private boolean loopGetPrivateKey = true;    
     private int contLoopStillAlive = 0;
 
     public Server(List<Jogador> jogadores, MultiCastPeer mCast) {
@@ -43,10 +47,7 @@ public class Server {
     public void addContLoop() {
         contLoopStillAlive += 88;
     }
-
-    public boolean isLoopMainGame() {
-        return loopMainGame;
-    }
+ 
 
     public void addJogador(Jogador jogador) {
         jogadores.add(jogador);
@@ -66,9 +67,9 @@ public class Server {
         return jogadorDaVez;
     }
 
-    public ArrayList<PrivateKey> getChavesPrivadas() {
-    	return chavesPrivadas;
-    }
+//    public ArrayList<PrivateKey> getChavesPrivadas() {
+//    	return chavesPrivadas;
+//    }
 
     private void mandarMensagemHello() {
         // TODO Auto-generated method stub
@@ -81,8 +82,7 @@ public class Server {
 
     }
 
-    private void adicionaChavePrivada(Object o) {
-    }
+  
 
     public void startJogo() {
         DatagramSocket aSocket = null;
@@ -90,31 +90,101 @@ public class Server {
         boolean isJogoLoop = true;
         try {
 
-            setDadosForca();
+            
 
 
             while (isJogoLoop) {
+            	setDadosForca();
                 mandarMensagemHello();
-                System.out.println("server inicializado");
+                
                 aSocket = new DatagramSocket(6789);
                 // create socket at agreed port
-                byte[] buffer = new byte[1000];
-                DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                aSocket.receive(request);
+                boolean msgRecebida = false;
+                int contJogadorVez = 0;
+                while(!msgRecebida)
+                {
+                	avisaVezDoJogador();
+                    System.out.println("Vez do jogador: " + jogadorDaVez.getNick());
+                	byte[] buffer = new byte[128];
+                	DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                	aSocket.setSoTimeout(15000);
+                	aSocket.receive(request);
+                	
+                	
+                	int contadorChave = 0;
+                	
+                	
+                	String resposta = new String(request.getData());
+                	
+//                	String testao = new String(request.getData());
+//                	request.getData().length
+                	Object o = Criptografia.decriptarComChavePublica(request.getData(), cPublicas.get(jogadorDaVez.getNick()));
+//                	Object o = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getNick()));
+//                	String resposta = null;
+                	 if (o instanceof String) {
+//                         jogador.addJogador((Jogador) o);
+                         resposta = (String)o;
+                     }
+                	
+                	if(resposta == null)
+                	{
+                		
+                		
+                		System.out.println("Não é o jogador da vez!");
+                		contJogadorVez++;
+                		
+                		if(contJogadorVez > 2)
+                		{
+                			msgRecebida = true;
+                			for(Jogador j: getJogadores())
+                			{
+                				if(j.getId() == jogadorDaVez.getId())
+                				{
+                					getJogadores().remove(j);
+                					break;
+                				}
+                			}
+                		}
+                		
+                	}
+                	else
+                	{
+                		if(resposta.equals(""))
+                		{
+                			System.out.println("Jogador passou a vez");
+                		}
+                		else
+                		{
+                			if(resposta.length()>1)
+                			{
+                				if(resposta.equals(palavraDaVez))
+                				{
+                					System.out.println("Palavra acertada!: " + palavraDaVez);
+                				}
+                				else
+                				{
+                					System.out.println("Errou... continuemos");
+                				}
+                			}
+                			else
+                			{
+                				//testa letra
+                				if(testaLetra(resposta))
+                				{
+                					isJogoLoop = false;
+                					String fim = "Acertou palavra! UAU";
+                					mCast.enviarMensagem(fim.getBytes());
+                				}
+                			}
+                			
+                			
+                		}
+                		String teste = new String(resposta);
+                		System.out.println(teste);
+                		msgRecebida = true;                		
+                	}
+                }
 
-//  				System.out.println(new String(request.getData()));
-
-
-
-
-                //chaveJogador = (Cha,,)request;
-//  				controleJogo(chaveJogador);  				
-
-
-
-                //DatagramPacket reply = new DatagramPacket(request.getData(), request.getLength(), 
-                //	request.getAddress(), request.getPort());
-//    			aSocket.send(controleJogo(chaveJogador));
             }
         } catch (SocketException e) {
             System.out.println("Socket: " + e.getMessage());
@@ -127,48 +197,61 @@ public class Server {
         }
     }
 
-    private void setDadosForca() {
+    private boolean testaLetra(String resposta) {
+		// TODO Auto-generated method stub
+    	if(!palavraTentada.contains(resposta))
+    	{
+    		palavraTentada.add(resposta);
+    	}
+    	
+    	String [] teste = new String[palavraDaVez.length()];
+    	
+    	for(int i=0; i<teste.length; i++)
+    	{
+    		teste[i] = "";
+    	}
+    	
+    	for(int i=0; i<teste.length;i++)
+    	{
+    		for(String s : palavraTentada)
+    		{
+    			if(s.equals(palavraDaVez.substring(i, i+1)))
+    			{
+    				teste[i] = s;
+    				break;
+    			}
+    		}
+    	}
+    	
+    	for(int i=0; i<teste.length; i++)
+    	{
+    		if(teste[i].equals(""))
+    		{
+    			return false;
+    		}
+    	}
+    	
+    	return true;
+    	
+		
+	}
+
+	private void avisaVezDoJogador() {
+		// TODO Auto-generated method stub
+    	String msg = "Jogador da vez: " + jogadorDaVez.getNick();
+    	for(int i=0;i<1;i++){
+    		mCast.enviarMensagem(msg.getBytes());
+    	}
+	}
+
+	private void setDadosForca() {
         jogadorDaVez = getJogadorDaVez();
 //		palavraDaVez = getProximaPalavra();
 
     }
 
     private DatagramPacket controleJogo(ChaveLetraJogadorController chaveJogador) {
-        // TODO Auto-generated method stub
-//		DatagramPacket replyPacket = null;
-//		int idJogador = chaveJogador.getId();
-//		if(jogadorDaVez.getId() == idJogador)
-//		{
-//
-//			//verifica se o usuario tentou a palavra inteira
-//			if(chaveJogador.getLetra().length()>1)
-//			{
-//				if(chaveJogador.getLetra().equals(palavraDaVez))
-//				{
-//					//acertou, fim
-//					
-//				}
-//				else
-//				{
-//					
-//					//fim, perdeu partida
-//				}
-//				
-//				limparDados();
-//			}
-//			if(chaveJogador.getLetra().length()==1)
-//			{
-//				if(palavraDaVez.contains(chaveJogador.getLetra()))
-//				{
-//					
-//				}
-//			}
-//			
-//			//escolhe o proximo jogador (mesmo que tenha passado a palavra em branco)
-//			jogadorDaVez = getJogadorDaVez();
-//		}
 
-//		return replyPacket;
         return null;
 
     }
@@ -190,19 +273,41 @@ public class Server {
         return Parameter.HOST_ADDRESS;
     }
 
-	public void setChavesPublicas(ArrayList<PublicKey> chavesPublicas) {
-		// TODO Auto-generated method stub
-		this.chavesPublicas = chavesPublicas;
+//	public void setChavesPublicas(ArrayList<PublicKey> chavesPublicas) {
+//		// TODO Auto-generated method stub
+//		this.chavesPublicas = chavesPublicas;
+//	}
+
+//	public void setChavesPrivadas(ArrayList<PrivateKey> chavesPrivadas) {
+//		// TODO Auto-generated method stub
+//		this.chavesPrivadas = chavesPrivadas;
+//	}
+
+//	public ArrayList<PublicKey> getChavesPublicas() {
+//		return chavesPublicas;
+//	}
+
+	public ArrayList<Jogador> getJogadores() {
+		return jogadores;
 	}
 
-	public void setChavesPrivadas(ArrayList<PrivateKey> chavesPrivadas) {
+	public void addChavePublica(String nick, PublicKey publicKey, PrivateKey privateKey) {
 		// TODO Auto-generated method stub
-		this.chavesPrivadas = chavesPrivadas;
+		
+		if(!cPublicas.containsKey(nick))
+		{
+			cPublicas.put(nick, publicKey);
+		}
+		
+		if(!cPrivadas.containsKey(nick))
+		{
+			cPrivadas.put(nick, privateKey);
+		}
+		
 	}
-
-	public ArrayList<PublicKey> getChavesPublicas() {
-		return chavesPublicas;
-	}
+	
+	
+	
 	
 	
 }

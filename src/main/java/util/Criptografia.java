@@ -23,7 +23,8 @@ public class Criptografia {
         try {
             final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITMO);
             final SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
-            keyGen.initialize(1024, random);
+            keyGen.initialize(128, random);
+//            keyGen.initialize(1024, random);
             pair = keyGen.generateKeyPair();
         } catch (Exception e) {
             System.out.println("Erro geração de key pair: " + e.getLocalizedMessage());
