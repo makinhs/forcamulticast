@@ -10,7 +10,7 @@ import javax.crypto.Cipher;
 
 public class Criptografia {
 
-    private final static String ALGORITMO = "RSA";
+    private final static String ALGORITMO = "RSA/ECB/NoPadding";
 
     /**
      * Retorna um KeyPair. KeyPair.getPrivate() recupera a chave privada e

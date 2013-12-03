@@ -14,6 +14,9 @@ public class Palavra {
 	private void preenchePalavras() {
 		palavras.add("banana");
 		palavras.add("polenta");
+		palavras.add("ovelha");
+		palavras.add("coca");
+		palavras.add("ganso");
 	}
 
 	public ArrayList<String> getPalavras() {

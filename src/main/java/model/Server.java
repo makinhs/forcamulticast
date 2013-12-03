@@ -92,7 +92,7 @@ public class Server {
 
             
 
-
+        	palavraDaVez = getProximaPalavra();
             while (isJogoLoop) {
             	setDadosForca();
                 mandarMensagemHello();
@@ -113,22 +113,12 @@ public class Server {
                 	
                 	int contadorChave = 0;
                 	
+                	byte[] response = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getNick()));
+                	String resposta = new String(response).trim();
                 	
-                	String resposta = new String(request.getData());
-                	
-//                	String testao = new String(request.getData());
-//                	request.getData().length
-                	Object o = Criptografia.decriptarComChavePublica(request.getData(), cPublicas.get(jogadorDaVez.getNick()));
-//                	Object o = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getNick()));
-//                	String resposta = null;
-                	 if (o instanceof String) {
-//                         jogador.addJogador((Jogador) o);
-                         resposta = (String)o;
-                     }
-                	
+
                 	if(resposta == null)
-                	{
-                		
+                	{                		
                 		
                 		System.out.println("Não é o jogador da vez!");
                 		contJogadorVez++;
@@ -155,11 +145,18 @@ public class Server {
                 		}
                 		else
                 		{
+                			String [] respos = resposta.split(" ");
+                			resposta = respos[0].trim();
                 			if(resposta.length()>1)
                 			{
+                				resposta.equalsIgnoreCase(palavraDaVez);
                 				if(resposta.equals(palavraDaVez))
                 				{
                 					System.out.println("Palavra acertada!: " + palavraDaVez);
+                					String fim = "Acertou palavra! UAU";
+                					mCast.enviarMensagem(fim.getBytes());
+                					palavraDaVez = getProximaPalavra();
+                					palavraTentada.clear();
                 				}
                 				else
                 				{
@@ -170,10 +167,11 @@ public class Server {
                 			{
                 				//testa letra
                 				if(testaLetra(resposta))
-                				{
-                					isJogoLoop = false;
+                				{                					
                 					String fim = "Acertou palavra! UAU";
                 					mCast.enviarMensagem(fim.getBytes());
+                					palavraDaVez = getProximaPalavra();
+                					palavraTentada.clear();
                 				}
                 			}
                 			
