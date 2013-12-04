@@ -9,6 +9,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 import util.Criptografia;
 import util.Parameter;
@@ -27,15 +28,15 @@ public class Server {
 //    private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
 //    private ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
     
-    private HashMap<String, PublicKey> cPublicas = new HashMap<String, PublicKey>();
-    private HashMap<String, PrivateKey> cPrivadas = new HashMap<String, PrivateKey>();
+    private TreeMap<Integer, PublicKey> cPublicas = new TreeMap<Integer, PublicKey>(new IdComparator());
+    private TreeMap<Integer, PrivateKey> cPrivadas = new TreeMap<Integer, PrivateKey>(new IdComparator());
     
     private boolean loopGetPrivateKey = true;    
     private int contLoopStillAlive = 0;
 
     public Server(List<Jogador> jogadores, MultiCastPeer mCast) {
         // TODO Auto-generated constructor stub
-        this.jogadores.addAll(jogadores);
+        this.jogadores.addAll(jogadores);        
         this.mCast = mCast;
         palavrasController = new Palavra();
     }
@@ -113,7 +114,7 @@ public class Server {
                 	
                 	int contadorChave = 0;
                 	
-                	byte[] response = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getNick()));
+                	byte[] response = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getId()));
                 	String resposta = new String(response).trim();
                 	
 
@@ -289,17 +290,17 @@ public class Server {
 		return jogadores;
 	}
 
-	public void addChavePublica(String nick, PublicKey publicKey, PrivateKey privateKey) {
+	public void addChavePublica(Integer id, PublicKey publicKey, PrivateKey privateKey) {
 		// TODO Auto-generated method stub
 		
-		if(!cPublicas.containsKey(nick))
+		if(!cPublicas.containsKey(id))
 		{
-			cPublicas.put(nick, publicKey);
+			cPublicas.put(id, publicKey);
 		}
 		
-		if(!cPrivadas.containsKey(nick))
+		if(!cPrivadas.containsKey(id))
 		{
-			cPrivadas.put(nick, privateKey);
+			cPrivadas.put(id, privateKey);
 		}
 		
 	}

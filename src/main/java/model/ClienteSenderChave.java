@@ -58,7 +58,7 @@ public class ClienteSenderChave {
 					{
 						if(porta == jogador.getPorta())
 						{
-							server.addChavePublica(jogador.getNick(), chavesPublicas.get(cont), chavesPrivadas.get(cont));
+							server.addChavePublica(jogador.getId(), chavesPublicas.get(cont), chavesPrivadas.get(cont));
 						}
 					}
 					

@@ -5,6 +5,9 @@ import java.io.Serializable;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -101,6 +104,7 @@ public class Jogador implements Serializable {
 		return chavePublica;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addJogador(Jogador jogador) {
 		boolean insere = true;
 
@@ -114,6 +118,19 @@ public class Jogador implements Serializable {
 		if (insere) {
 			getListaJogadores().add(jogador);
 		}
+		
+		Collections.sort(listaJogadores, new Comparator() {
+
+			@Override
+			public int compare(Object o1, Object o2) {
+				// TODO Auto-generated method stub
+				
+				Jogador j1 = (Jogador)o1;
+				Jogador j2 = (Jogador)o2;
+				
+				return j1.getId() < j2.getId() ? -1 : (j1.getId() > j2.getId() ? +1 : 0);
+			}
+		});
 	}
 
 	public boolean isDefinindoJogadores() {
@@ -171,7 +188,7 @@ public class Jogador implements Serializable {
 		this.nick = nick;
 	}
 
-	public ArrayList<Jogador> getListaJogadores() {
+	public List<Jogador> getListaJogadores() {
 		return listaJogadores;
 	}
 
