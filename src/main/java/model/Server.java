@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class Server {
     
     private boolean loopGetPrivateKey = true;
     private int contLoopStillAlive = 0;
+	private int contJogadorVez = 0;
 
     public Server(List<Jogador> jogadores, MultiCastPeer mCast) {
         // TODO Auto-generated constructor stub
@@ -40,6 +42,7 @@ public class Server {
         this.mCast = mCast;
         palavrasController = new Palavra();
         palavraDaVez = getProximaPalavra();
+        setDadosForca();
     }
 
     public boolean isLoopGetPrivateKey() {
@@ -96,13 +99,14 @@ public class Server {
 
         	
             while (isJogoLoop) {
-                    setDadosForca();
+                    
+            	//TODO: testar mensagem Hello... mudar pra outra thread seria melhor :)
                 mandarMensagemHello();
                 
                 aSocket = new DatagramSocket(6789);
                 // create socket at agreed port
                 boolean msgRecebida = false;
-                int contJogadorVez = 0;
+                
                 while(!msgRecebida)
                 {
                         avisaVezDoJogador();
@@ -149,7 +153,6 @@ public class Server {
                                      }
                                      
                              }
-                             //jogador da vez mandou a chave
                              else
                              {
                                      if(resposta.equals(""))
@@ -178,6 +181,7 @@ public class Server {
                                              }
                                              else
                                              {
+                                            	 //TODO: implementar corretamente a Forca pra quando o jogador enviar apenas 1 letra...
                                                      //testa letra
                                                      if(testaLetra(resposta))
                                                      {                                         
@@ -192,7 +196,8 @@ public class Server {
                                      }
                                      String teste = new String(resposta);
                                      System.out.println(teste);
-                                     msgRecebida = true;                 
+                                     msgRecebida = true;     
+                                     setDadosForca();
                              }
                         }
                         
@@ -200,6 +205,26 @@ public class Server {
                 }
 
             }
+        }catch(SocketTimeoutException e){
+        	//TODO: verificar quando só 1 jogador permanecer e encerrar o jogo. Verificar se quando for 'setDadosForca' se tem 
+        	//outro jogador para jogar, senão fechar o game...
+        	contJogadorVez++;
+        	System.out.println("timeout");
+        	if(contJogadorVez >2)
+        	{
+        		setDadosForca();
+        		System.out.println("tirando jogador");
+        		for(Jogador j: getJogadores())
+                {
+                        if(j.getId() == jogadorDaVez.getId())
+                        {
+                                getJogadores().remove(j);
+                                break;
+                        }
+                }
+        	}
+        	
+            
         } catch (SocketException e) {
             System.out.println("Socket: " + e.getMessage());
         } catch (IOException e) {
@@ -260,6 +285,7 @@ public class Server {
 
         private void setDadosForca() {
         jogadorDaVez = getJogadorDaVez();
+        contJogadorVez  = 0;
 //                palavraDaVez = getProximaPalavra();
 
     }
