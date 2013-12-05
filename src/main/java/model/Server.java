@@ -25,20 +25,21 @@ public class Server {
     private String palavraDaVez = "";
     private MultiCastPeer mCast;
     private ArrayList<String> palavraTentada = new ArrayList<String>();
-//    private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
-//    private ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
+// private ArrayList<PrivateKey> chavesPrivadas = new ArrayList<PrivateKey>();
+// private ArrayList<PublicKey> chavesPublicas = new ArrayList<PublicKey>();
     
     private TreeMap<Integer, PublicKey> cPublicas = new TreeMap<Integer, PublicKey>(new IdComparator());
     private TreeMap<Integer, PrivateKey> cPrivadas = new TreeMap<Integer, PrivateKey>(new IdComparator());
     
-    private boolean loopGetPrivateKey = true;    
+    private boolean loopGetPrivateKey = true;
     private int contLoopStillAlive = 0;
 
     public Server(List<Jogador> jogadores, MultiCastPeer mCast) {
         // TODO Auto-generated constructor stub
-        this.jogadores.addAll(jogadores);        
+        this.jogadores.addAll(jogadores);
         this.mCast = mCast;
         palavrasController = new Palavra();
+        palavraDaVez = getProximaPalavra();
     }
 
     public boolean isLoopGetPrivateKey() {
@@ -68,9 +69,9 @@ public class Server {
         return jogadorDaVez;
     }
 
-//    public ArrayList<PrivateKey> getChavesPrivadas() {
-//    	return chavesPrivadas;
-//    }
+// public ArrayList<PrivateKey> getChavesPrivadas() {
+//         return chavesPrivadas;
+// }
 
     private void mandarMensagemHello() {
         // TODO Auto-generated method stub
@@ -93,9 +94,9 @@ public class Server {
 
             
 
-        	palavraDaVez = getProximaPalavra();
+        	
             while (isJogoLoop) {
-            	setDadosForca();
+                    setDadosForca();
                 mandarMensagemHello();
                 
                 aSocket = new DatagramSocket(6789);
@@ -104,84 +105,98 @@ public class Server {
                 int contJogadorVez = 0;
                 while(!msgRecebida)
                 {
-                	avisaVezDoJogador();
+                        avisaVezDoJogador();
                     System.out.println("Vez do jogador: " + jogadorDaVez.getNick());
-                	byte[] buffer = new byte[128];
-                	DatagramPacket request = new DatagramPacket(buffer, buffer.length);
-                	aSocket.setSoTimeout(15000);
-                	aSocket.receive(request);
-                	
-                	
-                	int contadorChave = 0;
-                	
-                	byte[] response = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getId()));
-                	String resposta = new String(response).trim();
-                	
-
-                	if(resposta == null)
-                	{                		
-                		
-                		System.out.println("Não é o jogador da vez!");
-                		contJogadorVez++;
-                		
-                		if(contJogadorVez > 2)
-                		{
-                			msgRecebida = true;
-                			for(Jogador j: getJogadores())
-                			{
-                				if(j.getId() == jogadorDaVez.getId())
-                				{
-                					getJogadores().remove(j);
-                					break;
-                				}
-                			}
-                		}
-                		
-                	}
-                	else
-                	{
-                		if(resposta.equals(""))
-                		{
-                			System.out.println("Jogador passou a vez");
-                		}
-                		else
-                		{
-                			String [] respos = resposta.split(" ");
-                			resposta = respos[0].trim();
-                			if(resposta.length()>1)
-                			{
-                				resposta.equalsIgnoreCase(palavraDaVez);
-                				if(resposta.equals(palavraDaVez))
-                				{
-                					System.out.println("Palavra acertada!: " + palavraDaVez);
-                					String fim = "Acertou palavra! UAU";
-                					mCast.enviarMensagem(fim.getBytes());
-                					palavraDaVez = getProximaPalavra();
-                					palavraTentada.clear();
-                				}
-                				else
-                				{
-                					System.out.println("Errou... continuemos");
-                				}
-                			}
-                			else
-                			{
-                				//testa letra
-                				if(testaLetra(resposta))
-                				{                					
-                					String fim = "Acertou palavra! UAU";
-                					mCast.enviarMensagem(fim.getBytes());
-                					palavraDaVez = getProximaPalavra();
-                					palavraTentada.clear();
-                				}
-                			}
-                			
-                			
-                		}
-                		String teste = new String(resposta);
-                		System.out.println(teste);
-                		msgRecebida = true;                		
-                	}
+                        byte[] buffer = new byte[128];
+                        DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                        aSocket.setSoTimeout(15000);
+                        aSocket.receive(request);
+                        
+                        
+                        int contadorChave = 0;
+                        
+                        byte[] response = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getId()));
+                        
+                        
+                        //mensagem recebida nao eh do jogador da vez
+                        if(response == null)
+                        {
+                        	System.out.println("Não é o jogador da vez!");
+                        }
+                        else
+                        {
+                        	 String resposta = new String(response).trim();
+                             
+                        	 
+                        	 //conseguiu ler a chave porém não é do jogador da vez
+                             if(response[0] != 0)
+                             {                 
+                                     
+                                     System.out.println("Não é o jogador da vez!");
+                                     contJogadorVez++;
+                                     
+                                     if(contJogadorVez > 2)
+                                     {
+                                             msgRecebida = true;
+                                             for(Jogador j: getJogadores())
+                                             {
+                                                     if(j.getId() == jogadorDaVez.getId())
+                                                     {
+                                                             getJogadores().remove(j);
+                                                             break;
+                                                     }
+                                             }
+                                     }
+                                     
+                             }
+                             //jogador da vez mandou a chave
+                             else
+                             {
+                                     if(resposta.equals(""))
+                                     {
+                                             System.out.println("Jogador passou a vez");
+                                     }
+                                     else
+                                     {
+                                             String [] respos = resposta.split(" ");
+                                             resposta = respos[0].trim();
+                                             if(resposta.length()>1)
+                                             {
+                                                     resposta.equalsIgnoreCase(palavraDaVez);
+                                                     if(resposta.equals(palavraDaVez))
+                                                     {
+                                                             System.out.println("Palavra acertada!: " + palavraDaVez);
+                                                             String fim = "Acertou palavra! UAU";
+                                                             mCast.enviarMensagem(fim.getBytes());
+                                                             palavraDaVez = getProximaPalavra();
+                                                             palavraTentada.clear();
+                                                     }
+                                                     else
+                                                     {
+                                                             System.out.println("Errou... continuemos");
+                                                     }
+                                             }
+                                             else
+                                             {
+                                                     //testa letra
+                                                     if(testaLetra(resposta))
+                                                     {                                         
+                                                             String fim = "Acertou palavra! UAU";
+                                                             mCast.enviarMensagem(fim.getBytes());
+                                                             palavraDaVez = getProximaPalavra();
+                                                             palavraTentada.clear();
+                                                     }
+                                             }
+                                             
+                                             
+                                     }
+                                     String teste = new String(resposta);
+                                     System.out.println(teste);
+                                     msgRecebida = true;                 
+                             }
+                        }
+                        
+                       
                 }
 
             }
@@ -197,55 +212,55 @@ public class Server {
     }
 
     private boolean testaLetra(String resposta) {
-		// TODO Auto-generated method stub
-    	if(!palavraTentada.contains(resposta))
-    	{
-    		palavraTentada.add(resposta);
-    	}
-    	
-    	String [] teste = new String[palavraDaVez.length()];
-    	
-    	for(int i=0; i<teste.length; i++)
-    	{
-    		teste[i] = "";
-    	}
-    	
-    	for(int i=0; i<teste.length;i++)
-    	{
-    		for(String s : palavraTentada)
-    		{
-    			if(s.equals(palavraDaVez.substring(i, i+1)))
-    			{
-    				teste[i] = s;
-    				break;
-    			}
-    		}
-    	}
-    	
-    	for(int i=0; i<teste.length; i++)
-    	{
-    		if(teste[i].equals(""))
-    		{
-    			return false;
-    		}
-    	}
-    	
-    	return true;
-    	
-		
-	}
+                // TODO Auto-generated method stub
+            if(!palavraTentada.contains(resposta))
+            {
+                    palavraTentada.add(resposta);
+            }
+            
+            String [] teste = new String[palavraDaVez.length()];
+            
+            for(int i=0; i<teste.length; i++)
+            {
+                    teste[i] = "";
+            }
+            
+            for(int i=0; i<teste.length;i++)
+            {
+                    for(String s : palavraTentada)
+                    {
+                            if(s.equals(palavraDaVez.substring(i, i+1)))
+                            {
+                                    teste[i] = s;
+                                    break;
+                            }
+                    }
+            }
+            
+            for(int i=0; i<teste.length; i++)
+            {
+                    if(teste[i].equals(""))
+                    {
+                            return false;
+                    }
+            }
+            
+            return true;
+            
+                
+        }
 
-	private void avisaVezDoJogador() {
-		// TODO Auto-generated method stub
-    	String msg = "Jogador da vez: " + jogadorDaVez.getNick();
-    	for(int i=0;i<1;i++){
-    		mCast.enviarMensagem(msg.getBytes());
-    	}
-	}
+        private void avisaVezDoJogador() {
+                // TODO Auto-generated method stub
+            String msg = "Jogador da vez: " + jogadorDaVez.getNick();
+            for(int i=0;i<1;i++){
+                    mCast.enviarMensagem(msg.getBytes());
+            }
+        }
 
-	private void setDadosForca() {
+        private void setDadosForca() {
         jogadorDaVez = getJogadorDaVez();
-//		palavraDaVez = getProximaPalavra();
+//                palavraDaVez = getProximaPalavra();
 
     }
 
@@ -272,41 +287,45 @@ public class Server {
         return Parameter.HOST_ADDRESS;
     }
 
-//	public void setChavesPublicas(ArrayList<PublicKey> chavesPublicas) {
-//		// TODO Auto-generated method stub
-//		this.chavesPublicas = chavesPublicas;
-//	}
+//        public void setChavesPublicas(ArrayList<PublicKey> chavesPublicas) {
+//                // TODO Auto-generated method stub
+//                this.chavesPublicas = chavesPublicas;
+//        }
 
-//	public void setChavesPrivadas(ArrayList<PrivateKey> chavesPrivadas) {
-//		// TODO Auto-generated method stub
-//		this.chavesPrivadas = chavesPrivadas;
-//	}
+//        public void setChavesPrivadas(ArrayList<PrivateKey> chavesPrivadas) {
+//                // TODO Auto-generated method stub
+//                this.chavesPrivadas = chavesPrivadas;
+//        }
 
-//	public ArrayList<PublicKey> getChavesPublicas() {
-//		return chavesPublicas;
-//	}
+//        public ArrayList<PublicKey> getChavesPublicas() {
+//                return chavesPublicas;
+//        }
 
-	public ArrayList<Jogador> getJogadores() {
-		return jogadores;
-	}
+        public ArrayList<Jogador> getJogadores() {
+                return jogadores;
+        }
 
-	public void addChavePublica(Integer id, PublicKey publicKey, PrivateKey privateKey) {
-		// TODO Auto-generated method stub
-		
-		if(!cPublicas.containsKey(id))
-		{
-			cPublicas.put(id, publicKey);
+        public void addChavePublica(Integer id, PublicKey publicKey, PrivateKey privateKey) {
+                // TODO Auto-generated method stub
+                
+                if(!cPublicas.containsKey(id))
+                {
+                        cPublicas.put(id, publicKey);
+                }
+                
+                if(!cPrivadas.containsKey(id))
+                {
+                        cPrivadas.put(id, privateKey);
+                }
+                
+        }
+
+		public TreeMap<Integer, PublicKey> getcPublicas() {
+			return cPublicas;
 		}
-		
-		if(!cPrivadas.containsKey(id))
-		{
-			cPrivadas.put(id, privateKey);
-		}
-		
-	}
-	
-	
-	
-	
-	
+        
+        
+        
+        
+        
 }

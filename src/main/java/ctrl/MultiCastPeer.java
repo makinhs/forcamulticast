@@ -146,30 +146,44 @@ public class MultiCastPeer extends Thread implements Serializable {
     	if(enviaOuRecebeChave)
     	{
     		try {
-	    		for(int i=0; i<20; i++)
+//	    		for(int i=0; i<20; i++)
 	    		{
 		    		ClienteSenderChave csc = new ClienteSenderChave(jogador, jogador.getServer());
-	//	    		System.out.println("cliente 1 inicializado");
-		    		csc.enviaChavePublica(jogador.getListaJogadores().get(0).getPorta(), 0);
-		    	
-						sleep(100);
-				
+		    				    
+		    		if(!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(0).getId()))
+		    		{
+		    			csc.enviaChavePublica(jogador.getListaJogadores().get(0).getPorta(), 0);		    	
+						sleep(150);
+		    		}
 		    		
-	//	    		System.out.println("cliente 2 inicializado");
-						csc = new ClienteSenderChave(jogador, jogador.getServer());
-		    		csc.enviaChavePublica(jogador.getListaJogadores().get(1).getPorta(), 1);
-		    		sleep(100);
-	//	    		System.out.println("cliente 3 inicializado");
+
+		    		if(!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(1).getId()))
+		    		{
+		    			csc.enviaChavePublica(jogador.getListaJogadores().get(1).getPorta(), 1);
+		    			sleep(150);
+		    		}
+
+		    		if(!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(2).getId()))
+		    		{
+		    			csc.enviaChavePublica(jogador.getListaJogadores().get(2).getPorta(), 2);
+		    			sleep(150);
+		    		}
 		    		
-		    		csc = new ClienteSenderChave(jogador, jogador.getServer());
-		    		csc.enviaChavePublica(jogador.getListaJogadores().get(2).getPorta(), 2);
-		    		sleep(100);
+		    		for(Jogador j: jogador.getListaJogadores())
+		    		{
+		    			if(!jogador.getServer().getcPublicas().containsKey(j.getId()))
+		    			{
+		    				enviaOuRecebeChave = true;
+		    				break;
+		    			}
+		    		}
+		    		enviaOuRecebeChave = false;
 	    		}
     		} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-    		enviaOuRecebeChave = false;
+    		
     	}
     	else
     	{

@@ -28,7 +28,7 @@ public class Jogador implements Serializable {
 	private transient Server servidorUDP = null;
 	private transient Client clienteUDP = null;
 	private transient PrivateKey chavePrivada;
-	private PublicKey chavePublica;
+	private PublicKey chavePublica = null;
 	private boolean chavePublicaRecebida = false; 
 	private int porta = 0;
 	public boolean isJogadorDaVez = false;
