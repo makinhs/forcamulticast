@@ -33,6 +33,10 @@ public class Jogador implements Serializable {
 	private int porta = 0;
 	public boolean isJogadorDaVez = false;
 
+	/**
+	 * Construtora para o Jogador
+	 * @param nick recebe o nick do jogador
+	 */
 	public Jogador(String nick) {		
 		this.nick = nick;
 		this.isServer = false;
@@ -44,10 +48,15 @@ public class Jogador implements Serializable {
 		multicastConnection = new MultiCastPeer(this);
 		addJogador(this);
 		
+		//gera uma porta para o Jogador caso necessite criar um server UDP (range entre 6000 à 7000)
 		porta = 6000 + (int)(Math.random() * ((6999 - 6000) + 1));
 		
 	}
 
+	/**
+	 * Gerador de ID
+	 * @param id recebe o ID do jogador e insere na lista
+	 */
 	public void addIdJogadores(int id) {
 		boolean insereId = true;
 
@@ -102,6 +111,11 @@ public class Jogador implements Serializable {
 		return chavePublica;
 	}
 
+	
+	/**
+	 * Método que  adiciona os outros jogadores a lista de jogadores deste Jogador
+	 * @param jogador
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addJogador(Jogador jogador) {
 		boolean insere = true;

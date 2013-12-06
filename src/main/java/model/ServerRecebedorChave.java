@@ -9,16 +9,29 @@ import java.security.PublicKey;
 
 import util.Serializer;
 
+/**
+ * Classe responsável para criar um server para receber as chaves publicas utilizadas pelo Cliente.
+ * 
+ *
+ */
 public class ServerRecebedorChave {
 
     private int porta = 0;
     private Jogador jogador;
 
+    /**
+     * Construtora que recebe a porta do jogador e o jogador
+     * @param porta um int representando a porta do jogador
+     * @param j o próprio jogador em questão
+     */
     public ServerRecebedorChave(int porta, Jogador j) {
         this.porta = porta;
         this.jogador = j;
     }
 
+    /**
+     * Método que executa o server UDP e fica esperando receber a chave publica do servidor para o cliente.
+     */
     public void run() {
         DatagramSocket aSocket = null;
         try {

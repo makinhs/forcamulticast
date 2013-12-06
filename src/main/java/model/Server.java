@@ -16,6 +16,11 @@ import util.Criptografia;
 import util.Parameter;
 import ctrl.MultiCastPeer;
 
+
+/**
+ * Classe responsável pelo Servidor UDP do jogo da Forca
+ *
+ */
 public class Server {
 
     private ArrayList<Jogador> jogadores = new ArrayList<Jogador>();
@@ -36,6 +41,11 @@ public class Server {
     private int contLoopStillAlive = 0;
     private int contJogadorVez = 0;
 
+    /**
+     * Construtora que recebe a lista de Jogadores que são os clientes do jogo da Forca e o MultiCast do Servidor
+     * @param jogadores 
+     * @param mCast
+     */
     public Server(List<Jogador> jogadores, MultiCastPeer mCast) {
         this.jogadores.addAll(jogadores);
         this.mCast = mCast;
@@ -61,24 +71,38 @@ public class Server {
         jogadores.addAll(jogadores);
     }
 
+    
+    /**
+     * Método que retorna qual o jogador da vez da rodada.
+     * @return retorna um Jogador caso exista ou NULL caso não tenha mais jogadores (no caso de terem todos caído...)
+     */
     public Jogador getJogadorDaVez() {
         Jogador jogadorDaVez = null;
         try {
-            jogadorDaVez = jogadores.get(cont);
-            cont++;
-            if (cont == jogadores.size()) {
-                cont = 0;
-            }
+        	
+        	if(jogadores.size() < cont)
+        	{
+        		String msg = "Sem jogadores para continuar";
+        		mCast.enviarMensagem(msg.getBytes());
+        	}
+        	else
+        	{        	
+	            jogadorDaVez = jogadores.get(cont);
+	            cont++;
+	            if (cont == jogadores.size()) {
+	                cont = 0;
+	            }
+        	}
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Estourou array de jogadores: " + e.getLocalizedMessage());
         }
         return jogadorDaVez;
     }
 
-    // public ArrayList<PrivateKey> getChavesPrivadas() {
-    //         return chavesPrivadas;
-    // }
 
+    /**
+     * Método que envia uma mensagem de Hello caso tenha dado estourado o tempo determinado para enviar a mensagem
+     */
     private void mandarMensagemHello() {
         addContLoop();
         String hello = "hello";
@@ -89,11 +113,16 @@ public class Server {
 
     }
 
+    
+    /**
+     * Método que inicializa o jogo
+     */
     public void startJogo() {
-        DatagramSocket aSocket = null;
-        ChaveLetraJogadorController chaveJogador = null;
+        DatagramSocket aSocket = null;        
         boolean isJogoLoop = true;
         try {
+        	
+        	//thread responsável de enviar mensagem de HELLO a cada intervalo de tempo.
             new Thread(new Runnable() {
 
                 @Override
@@ -102,12 +131,16 @@ public class Server {
                 }
             }).start();
 
+            
+            //Loop do jogo
             while (isJogoLoop) {
                 //TODO: testar mensagem Hello... mudar pra outra thread seria melhor :)
                 aSocket = new DatagramSocket(6789);
                 // create socket at agreed port
                 boolean msgRecebida = false;
-
+                
+                
+                //Laço para receber a mensagem do jogador da vez.
                 while (!msgRecebida) {
                     avisaVezDoJogador();
                     System.out.println("Vez do jogador: " + jogadorDaVez.getNick());
@@ -121,14 +154,13 @@ public class Server {
                     }
 
                     byte[] buffer = new byte[128];
-                    DatagramPacket request = new DatagramPacket(buffer, buffer.length);
+                    DatagramPacket request = new DatagramPacket(buffer, buffer.length);                    
                     aSocket.setSoTimeout(15000);
                     aSocket.receive(request);
 
                     int contadorChave = 0;
 
                     byte[] response = Criptografia.decriptarComChavePrivada(request.getData(), cPrivadas.get(jogadorDaVez.getId()));
-                    //                    byte[] response = request.getData();
 
                     //mensagem recebida nao eh do jogador da vez
                     if (response == null) {
@@ -142,14 +174,15 @@ public class Server {
                             System.out.println("Não é o jogador da vez!");
                             contJogadorVez++;
 
+                            //tenta 3 vezes receber o jogador da vez, senão der certo passa para o próximo
                             if (contJogadorVez > 2) {
                                 msgRecebida = true;
-                                for (Jogador j : getJogadores()) {
-                                    if (j.getId() == jogadorDaVez.getId()) {
-                                        getJogadores().remove(j);
-                                        break;
-                                    }
-                                }
+//                                for (Jogador j : getJogadores()) {
+//                                    if (j.getId() == jogadorDaVez.getId()) {
+////                                        getJogadores().remove(j);
+////                                        break;
+//                                    }
+//                                }
                             }
 
                         } else {
@@ -184,13 +217,13 @@ public class Server {
             System.out.println("timeout");
             if (contJogadorVez > 2) {
                 setDadosForca();
-                System.out.println("tirando jogador");
-                for (Jogador j : getJogadores()) {
-                    if (j.getId() == jogadorDaVez.getId()) {
-                        getJogadores().remove(j);
-                        break;
-                    }
-                }
+//                System.out.println("tirando jogador");
+//                for (Jogador j : getJogadores()) {
+//                    if (j.getId() == jogadorDaVez.getId()) {
+//                        getJogadores().remove(j);
+//                        break;
+//                    }
+//                }
             }
 
         } catch (SocketException e) {
@@ -260,11 +293,6 @@ public class Server {
         }
     }
 
-    private DatagramPacket controleJogo(ChaveLetraJogadorController chaveJogador) {
-
-        return null;
-
-    }
 
     private void limparDados() {
         palavraDaVez = getProximaPalavra();

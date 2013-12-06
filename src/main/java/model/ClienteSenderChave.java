@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import util.Parameter;
 import util.Serializer;
 
+/**
+ * Classe responsável por enviar via UDP uma chave publica a um cliente e a associar esta e uma privada ao servidor
+ * 
+ *
+ */
 public class ClienteSenderChave {
 	
 	private Jogador jogador;
@@ -19,12 +24,20 @@ public class ClienteSenderChave {
 	private ArrayList<PrivateKey> chavesPrivadas;
 	private ArrayList<PublicKey> chavesPublicas;
 	
+	/**
+	 * 
+	 * @param j jogador a receber a chave publica
+	 * @param s servidor
+	 */
 	public ClienteSenderChave(Jogador j, Server s) {
 		this.jogador = j;
 		this.server = s;
 		inicializarChaves();
 	}
 	
+	/**
+	 * Método que inicializa o par de chaves publica/privada
+	 */
 	public void inicializarChaves()
 	{
 		chavesPrivadas = new ArrayList<PrivateKey>();
@@ -36,11 +49,14 @@ public class ClienteSenderChave {
 			chavesPublicas.add(chave.getPub());
 		}
 		
-//		server.setChavesPublicas(chavesPublicas);
-//		server.setChavesPrivadas(chavesPrivadas);
 		
 	}
 	
+	/**
+	 * Método que envia via UDP 
+	 * @param porta a porta do server UDP
+	 * @param cont inteiro associado a uma lista contendo os jogadores
+	 */
 	public void enviaChavePublica(int porta, int cont)
 	{
 		// args give message contents and destination hostname
@@ -61,13 +77,7 @@ public class ClienteSenderChave {
 							server.addChavePublica(jogador.getId(), chavesPublicas.get(cont), chavesPrivadas.get(cont));
 						}
 					}
-					
-//					System.out.println("Enviado chave cliente: " + jogador.getNick());
-					
-//					byte[] buffer = new byte[1000];
-//					DatagramPacket reply = new DatagramPacket(buffer, buffer.length);	
-//					aSocket.receive(reply);
-//					System.out.println("Reply: " + new String(reply.getData()));	
+
 				}catch (SocketException e){System.out.println("Socket: " + e.getMessage());
 				}catch (IOException e){System.out.println("IO: " + e.getMessage());
 				}finally {if(aSocket != null) aSocket.close();}

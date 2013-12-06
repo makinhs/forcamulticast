@@ -13,6 +13,12 @@ import java.util.logging.Logger;
 import util.Criptografia;
 import util.Serializer;
 
+
+/**
+ * Classe responsável para rodar o Cliente do jogo 
+ * 
+ *
+ */
 public class Client {
 
     private int port = 6789;
@@ -22,6 +28,11 @@ public class Client {
     private Jogador jogador;
     private boolean chaveEnviada = false;
 
+    /**
+     * Construtora do Cliente.
+     * @param ipAddress Recebe o endereço em String para o cliente se conectar a um server UDP
+     * @param jogador Recebe o jogador.
+     */
     public Client(String ipAddress, Jogador jogador) {
         try {
             this.ipAddress = ipAddress;
@@ -35,6 +46,10 @@ public class Client {
         }
     }
 
+    /**
+     * Método que envia via UDP uma tentativa de acerto para a Forca
+     * @param msg
+     */
     public void enviarChute(String msg) {
         try {
             byte[] msgByte = Criptografia.encriptarComChavePublica(msg.getBytes(), jogador.getChavePublica());
@@ -48,14 +63,4 @@ public class Client {
         }
     }
     
-//    public void enviarChavePrivada() {
-//        try {
-//            DatagramPacket request = new DatagramPacket(jogador.getPrivateKey(), jogador.getPrivateKey().length, host, port);
-//            socket.send(request);
-//            Random r = new Random();
-//            Thread.sleep(r.nextInt(200));
-//        } catch (Exception e) {
-//            System.out.println("Erro Envio chave privada: " + e.getLocalizedMessage());
-//        }
-//    }
 }

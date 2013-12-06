@@ -2,6 +2,11 @@ package model;
 
 import java.util.ArrayList;
 
+/**
+ * Classe que contém as palavras pré-estabelecidas para o jogo da Forca 
+ * 
+ *
+ */
 public class Palavra {
 
 

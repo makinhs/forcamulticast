@@ -34,6 +34,10 @@ public class MultiCastPeer extends Thread implements Serializable {
 
     int batata = 10;
 
+    /**
+     * Construtora do Multicast por jogador. 
+     * @param jogador Recebe o jogador como parâmetro.
+     */
     public MultiCastPeer(Jogador jogador) {
         try {
             this.jogador = jogador;
@@ -50,6 +54,12 @@ public class MultiCastPeer extends Thread implements Serializable {
     }
 
     @Override
+    /**
+     * Método que tem 3 partes:
+     * 1 - Inserção dos jogadores numa lista ordenada de cada 1 que após estar cheia, elege o servidor
+     * 2 - Caso o jogador seja o servidor, inicializa o server
+     * 3 - Caso o jogador seja cliente, inicializa o cliente
+     */
     public void run() {
         while (!socket.isClosed()) {
 
@@ -71,6 +81,11 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
+    
+    /**
+     * Método que inicializa o Cliente do jogo, criando inicialmente uma conexão unicast UDP para receber a chave Publica dele.
+     * 
+     */
     private synchronized void inicializarClienteUDP() {
         // loop do jogo
         Client c = jogador.getClient();
@@ -112,6 +127,11 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
+    
+    /**
+     * Método que verifica se recebeu a mensagem de hello via multicast
+     * @return true caso tenha recebido a mensagem de hello e false caso contrário
+     */
     private boolean isServerUP() {
         byte[] buffer = new byte[1024];
         DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -130,6 +150,9 @@ public class MultiCastPeer extends Thread implements Serializable {
         return false;
     }
 
+    /**
+     * Método que envia as chaves publicas aos clientes e após inicializa o servidor
+     */
     private void inicializarServidorUDP() {
 
         if (enviaOuRecebeChave) {
@@ -137,20 +160,20 @@ public class MultiCastPeer extends Thread implements Serializable {
                 //	    		for(int i=0; i<20; i++)
                 {
                     ClienteSenderChave csc = new ClienteSenderChave(jogador, jogador.getServer());
-
+                    sleep(1750);
                     if (!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(0).getId())) {
                         csc.enviaChavePublica(jogador.getListaJogadores().get(0).getPorta(), 0);
-                        sleep(1500);
+                        sleep(500);
                     }
 
                     if (!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(1).getId())) {
                         csc.enviaChavePublica(jogador.getListaJogadores().get(1).getPorta(), 1);
-                        sleep(1500);
+                        sleep(500);
                     }
 
                     if (!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(2).getId())) {
                         csc.enviaChavePublica(jogador.getListaJogadores().get(2).getPorta(), 2);
-                        sleep(1500);
+                        sleep(500);
                     }
 
                     for (Jogador j : jogador.getListaJogadores()) {
