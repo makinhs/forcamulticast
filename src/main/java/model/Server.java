@@ -9,6 +9,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -36,6 +37,8 @@ public class Server {
 
     private TreeMap<Integer, PublicKey> cPublicas = new TreeMap<Integer, PublicKey>(new IdComparator());
     private TreeMap<Integer, PrivateKey> cPrivadas = new TreeMap<Integer, PrivateKey>(new IdComparator());
+    
+    private HashMap<Integer, Integer> idContNaoJogou = new HashMap<Integer, Integer>();
 
     private boolean loopGetPrivateKey = true;
     private int contLoopStillAlive = 0;
@@ -186,6 +189,11 @@ public class Server {
                             }
 
                         } else {
+                        	
+                        	
+                        	idContNaoJogou.put(jogadorDaVez.getId(), 0);
+                        	
+                        	
                             if (resposta.equals("")) {
                                 System.out.println("Jogador passou a vez");
                             } else {
@@ -215,16 +223,31 @@ public class Server {
             //outro jogador para jogar, senão fechar o game...
             contJogadorVez++;
             System.out.println("timeout");
-            if (contJogadorVez > 2) {
-                setDadosForca();
-//                System.out.println("tirando jogador");
-//                for (Jogador j : getJogadores()) {
-//                    if (j.getId() == jogadorDaVez.getId()) {
-//                        getJogadores().remove(j);
-//                        break;
-//                    }
-//                }
-            }
+//            if (contJogadorVez > 2) {
+                
+            	if(idContNaoJogou.containsKey(jogadorDaVez.getId()))
+            	{
+            		idContNaoJogou.put(jogadorDaVez.getId(), idContNaoJogou.get(jogadorDaVez.getId())+1);
+            		
+            		if(idContNaoJogou.get(jogadorDaVez.getId()) >=3)
+            		{
+            			for(Jogador j : jogadores)
+            			{
+            				if(j.getId() == jogadorDaVez.getId())
+            				{
+            					jogadores.remove(j);
+            				}
+            			}
+            		}
+            	}
+            	else
+            	{
+            		idContNaoJogou.put(jogadorDaVez.getId(), 1);
+            	}
+            	
+            	setDadosForca();
+                
+//            }
 
         } catch (SocketException e) {
             System.out.println("Socket: " + e.getMessage());
