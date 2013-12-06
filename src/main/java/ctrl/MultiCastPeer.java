@@ -31,7 +31,7 @@ public class MultiCastPeer extends Thread implements Serializable {
 
     private boolean myTurn = false;
     private boolean enviaOuRecebeChave = true;
-    
+
     int batata = 10;
 
     public MultiCastPeer(Jogador jogador) {
@@ -72,8 +72,6 @@ public class MultiCastPeer extends Thread implements Serializable {
     }
 
     private synchronized void inicializarClienteUDP() {
-        // TODO Auto-generated method stub
-
         // loop do jogo
         Client c = jogador.getClient();
 
@@ -89,26 +87,20 @@ public class MultiCastPeer extends Thread implements Serializable {
             contHelloEmMs = 0;
         } else {
             if (isServerUp) {
-               //inicializa servidor UDP para receber as chaves do server do jogo
-            	if(enviaOuRecebeChave)
-            	{
-            		System.out.println("Inicializado server chave publica nick: "  + jogador.getNick());
-            		ServerRecebedorChave src = new ServerRecebedorChave(jogador.getPorta(), jogador);
-            		src.run();
-            		enviaOuRecebeChave = false;
-            	}
-            	else
-            	{
-            		if(jogador.getChavePublica() != null)
-            		{
-            			if(isJogadorDaVez())
-            			{
-//            				jogador.getClient().enviarChute("teste");
-            			}
-            		}
-            	}
-            	
-            	
+                //inicializa servidor UDP para receber as chaves do server do jogo
+                if (enviaOuRecebeChave) {
+                    System.out.println("Inicializado server chave publica nick: " + jogador.getNick());
+                    ServerRecebedorChave src = new ServerRecebedorChave(jogador.getPorta(), jogador);
+                    src.run();
+                    enviaOuRecebeChave = false;
+                } else {
+                    if (jogador.getChavePublica() != null) {
+                        if (isJogadorDaVez()) {
+                            //            				jogador.getClient().enviarChute("teste");
+                        }
+                    }
+                }
+
             }
         }
 
@@ -116,7 +108,6 @@ public class MultiCastPeer extends Thread implements Serializable {
             sleep(50);
             contHelloEmMs += 50;
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -139,62 +130,49 @@ public class MultiCastPeer extends Thread implements Serializable {
         return false;
     }
 
-
     private void inicializarServidorUDP() {
-        // TODO Auto-generated method stub
 
-    	if(enviaOuRecebeChave)
-    	{
-    		try {
-//	    		for(int i=0; i<20; i++)
-	    		{
-		    		ClienteSenderChave csc = new ClienteSenderChave(jogador, jogador.getServer());
-		    				    
-		    		if(!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(0).getId()))
-		    		{
-		    			csc.enviaChavePublica(jogador.getListaJogadores().get(0).getPorta(), 0);		    	
-						sleep(150);
-		    		}
-		    		
+        if (enviaOuRecebeChave) {
+            try {
+                //	    		for(int i=0; i<20; i++)
+                {
+                    ClienteSenderChave csc = new ClienteSenderChave(jogador, jogador.getServer());
 
-		    		if(!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(1).getId()))
-		    		{
-		    			csc.enviaChavePublica(jogador.getListaJogadores().get(1).getPorta(), 1);
-		    			sleep(150);
-		    		}
+                    if (!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(0).getId())) {
+                        csc.enviaChavePublica(jogador.getListaJogadores().get(0).getPorta(), 0);
+                        sleep(1500);
+                    }
 
-		    		if(!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(2).getId()))
-		    		{
-		    			csc.enviaChavePublica(jogador.getListaJogadores().get(2).getPorta(), 2);
-		    			sleep(150);
-		    		}
-		    		
-		    		for(Jogador j: jogador.getListaJogadores())
-		    		{
-		    			if(!jogador.getServer().getcPublicas().containsKey(j.getId()))
-		    			{
-		    				enviaOuRecebeChave = true;
-		    				break;
-		    			}
-		    		}
-		    		enviaOuRecebeChave = false;
-	    		}
-    		} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		
-    	}
-    	else
-    	{
-    	
+                    if (!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(1).getId())) {
+                        csc.enviaChavePublica(jogador.getListaJogadores().get(1).getPorta(), 1);
+                        sleep(1500);
+                    }
+
+                    if (!jogador.getServer().getcPublicas().containsKey(jogador.getListaJogadores().get(2).getId())) {
+                        csc.enviaChavePublica(jogador.getListaJogadores().get(2).getPorta(), 2);
+                        sleep(1500);
+                    }
+
+                    for (Jogador j : jogador.getListaJogadores()) {
+                        if (!jogador.getServer().getcPublicas().containsKey(j.getId())) {
+                            enviaOuRecebeChave = true;
+                            break;
+                        }
+                    }
+                    enviaOuRecebeChave = false;
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+
             // começa o server udp
-           jogador.getServer().startJogo();
-            
-    	}
+            jogador.getServer().startJogo();
+
+        }
 
     }
-
 
     /**
      * Envia uma mensagem para o grupo multicast
@@ -222,41 +200,38 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
-    
     private boolean isJogadorDaVez() {
         byte[] buffer = new byte[1024];
         DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
         try {
             this.enviarMensagem(jogador.sendInfo());
             socket.receive(msgIn);
-            
+
             String jogadorDaVez = new String(msgIn.getData());
-            
-            if(jogadorDaVez != null)
-            {
-            	if(jogadorDaVez.equals("Jogador da vez: " + jogador.getNick()))
-            	{
-            		jogador.setJogadorDaVez(true);
-            		return true;
-            	}
+
+            if (jogadorDaVez != null) {
+                if (jogadorDaVez.equalsIgnoreCase("Jogador da vez: " + jogador.getNick())) {
+                    jogador.setJogadorDaVez(true);
+                    return true;
+                }
             }
-            
-//            Object o = Serializer.deserialize(msgIn.getData());
-//            if (o instanceof Jogador) {
-//                jogador.addJogador((Jogador) o);
-//            }
-//            sleep(1250);
+
+            //            Object o = Serializer.deserialize(msgIn.getData());
+            //            if (o instanceof Jogador) {
+            //                jogador.addJogador((Jogador) o);
+            //            }
+            //            sleep(1250);
             // enviarMensagem("Recebido por " + usuario);
         } catch (IOException e) {
-            System.out.println("Erro I/O: " + e.getLocalizedMessage());        
+            System.out.println("Erro I/O: " + e.getLocalizedMessage());
         } finally {
             cleanBuffer(buffer);
         }
-        
+
         jogador.setJogadorDaVez(false);
         return false;
     }
-    
+
     private void adicionarJogadores() {
         byte[] buffer = new byte[1024];
         DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -287,8 +262,10 @@ public class MultiCastPeer extends Thread implements Serializable {
             try {
                 socket.send(msgOut);
                 sleep(50);
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 System.out.println("Erro I/O: " + e.getLocalizedMessage());
+            } catch (InterruptedException e) {
+                System.out.println("Erro InterruptedException: " + e.getLocalizedMessage());
             }
         }
     }

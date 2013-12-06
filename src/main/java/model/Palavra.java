@@ -27,6 +27,4 @@ public class Palavra {
 		this.palavras = palavras;
 	}
 	
-	
-
 }

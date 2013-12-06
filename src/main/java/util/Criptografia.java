@@ -24,7 +24,7 @@ public class Criptografia {
             final KeyPairGenerator keyGen = KeyPairGenerator.getInstance(ALGORITMO);
             final SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
             keyGen.initialize(128, random);
-//            keyGen.initialize(1024, random);
+//            keyGen.initialize(2048, random);
             pair = keyGen.generateKeyPair();
         } catch (Exception e) {
             System.out.println("Erro geração de key pair: " + e.getLocalizedMessage());
@@ -65,7 +65,7 @@ public class Criptografia {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             cipherData = cipher.doFinal(mensagem);
         } catch (Exception ex) {
-            System.out.println("Erro Encrypt com chave privada: " + ex.getLocalizedMessage());
+            System.out.println("Erro Encrypt com chave publica: " + ex.getLocalizedMessage());
         }
         return cipherData;
     }
@@ -84,7 +84,7 @@ public class Criptografia {
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             cipherData = cipher.doFinal(msgEncriptada);
         } catch (Exception ex) {
-            System.out.println("Erro Encrypt com chave privada: " + ex.getLocalizedMessage());
+            System.out.println("Erro Decrypt com chave privada: " + ex.getLocalizedMessage());
         }
         return cipherData;
     }
@@ -103,7 +103,7 @@ public class Criptografia {
             cipher.init(Cipher.DECRYPT_MODE, publicKey);
             cipherData = cipher.doFinal(msgEncriptada);
         } catch (Exception ex) {
-            System.out.println("Erro Encrypt com chave privada: " + ex.getLocalizedMessage());
+            System.out.println("Erro Decrypt com chave pública: " + ex.getLocalizedMessage());
         }
         return cipherData;
     }

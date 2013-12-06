@@ -80,7 +80,6 @@ public class Jogador implements Serializable {
 		try {
 			return Serializer.serialize(chavePrivada);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -90,7 +89,6 @@ public class Jogador implements Serializable {
 		try {
 			return Serializer.serialize(chavePublica);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
@@ -123,8 +121,6 @@ public class Jogador implements Serializable {
 
 			@Override
 			public int compare(Object o1, Object o2) {
-				// TODO Auto-generated method stub
-				
 				Jogador j1 = (Jogador)o1;
 				Jogador j2 = (Jogador)o2;
 				
@@ -209,7 +205,6 @@ public class Jogador implements Serializable {
 	}
 
 	public Server getServer() {
-		// TODO Auto-generated method stub
 		if (isServer) {
 			if (servidorUDP == null) {
 				getListaJogadores().remove(this);
@@ -262,7 +257,6 @@ public class Jogador implements Serializable {
 	}
 	
 	public boolean isJogadorDaVez() {
-		// TODO Auto-generated method stub
 		return isJogadorDaVez;
 	}
 

@@ -36,26 +36,26 @@ public class Client {
     }
 
     public void enviarChute(String msg) {
-    	try {
-    		
-    	byte[] msgByte = Criptografia.encriptarComChavePublica(msg.getBytes(), jogador.getChavePublica());
-
-    	DatagramPacket request = new DatagramPacket(msgByte, msgByte.length, host, port);
-    	socket.send(request);
-
-    	} catch (IOException ex) {
-    	System.out.println("Erro Envio: " + ex.getLocalizedMessage());
-    	}
-    	}
-
-    public void enviarChavePrivada() {
         try {
-            DatagramPacket request = new DatagramPacket(jogador.getPrivateKey(), jogador.getPrivateKey().length, host, port);
+            byte[] msgByte = Criptografia.encriptarComChavePublica(msg.getBytes(), jogador.getChavePublica());
+//            byte[] msgByte = msg.getBytes();
+            
+            DatagramPacket request = new DatagramPacket(msgByte, msgByte.length, host, port);
             socket.send(request);
-            Random r = new Random();
-            Thread.sleep(r.nextInt(200));
-        } catch (Exception e) {
-            System.out.println("Erro Envio chave privada: " + e.getLocalizedMessage());
+
+        } catch (IOException ex) {
+            System.out.println("Erro Envio: " + ex.getLocalizedMessage());
         }
     }
+    
+//    public void enviarChavePrivada() {
+//        try {
+//            DatagramPacket request = new DatagramPacket(jogador.getPrivateKey(), jogador.getPrivateKey().length, host, port);
+//            socket.send(request);
+//            Random r = new Random();
+//            Thread.sleep(r.nextInt(200));
+//        } catch (Exception e) {
+//            System.out.println("Erro Envio chave privada: " + e.getLocalizedMessage());
+//        }
+//    }
 }
