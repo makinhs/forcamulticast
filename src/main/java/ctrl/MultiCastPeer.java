@@ -32,7 +32,7 @@ public class MultiCastPeer extends Thread implements Serializable {
     private boolean myTurn = false;
     private boolean enviaOuRecebeChave = true;
 
-    int batata = 10;
+   
 
     /**
      * Construtora do Multicast por jogador. 
@@ -108,12 +108,6 @@ public class MultiCastPeer extends Thread implements Serializable {
                     ServerRecebedorChave src = new ServerRecebedorChave(jogador.getPorta(), jogador);
                     src.run();
                     enviaOuRecebeChave = false;
-                } else {
-                    if (jogador.getChavePublica() != null) {
-                        if (isJogadorDaVez()) {
-                            //            				jogador.getClient().enviarChute("teste");
-                        }
-                    }
                 }
 
             }
@@ -223,38 +217,6 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
-    private boolean isJogadorDaVez() {
-        byte[] buffer = new byte[1024];
-        DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
-        try {
-            this.enviarMensagem(jogador.sendInfo());
-            socket.receive(msgIn);
-
-            String jogadorDaVez = new String(msgIn.getData());
-
-            if (jogadorDaVez != null) {
-                if (jogadorDaVez.equalsIgnoreCase("Jogador da vez: " + jogador.getNick())) {
-                    jogador.setJogadorDaVez(true);
-                    return true;
-                }
-            }
-
-            //            Object o = Serializer.deserialize(msgIn.getData());
-            //            if (o instanceof Jogador) {
-            //                jogador.addJogador((Jogador) o);
-            //            }
-            //            sleep(1250);
-            // enviarMensagem("Recebido por " + usuario);
-        } catch (IOException e) {
-            System.out.println("Erro I/O: " + e.getLocalizedMessage());
-        } finally {
-            cleanBuffer(buffer);
-        }
-
-        jogador.setJogadorDaVez(false);
-        return false;
-    }
-
     private void adicionarJogadores() {
         byte[] buffer = new byte[1024];
         DatagramPacket msgIn = new DatagramPacket(buffer, buffer.length, group, PORT);
@@ -278,18 +240,4 @@ public class MultiCastPeer extends Thread implements Serializable {
         }
     }
 
-    public void enviarAvisoPrivadasFim(byte[] msg) {
-        for (int i = 0; i < 10; i++) {
-            DatagramPacket msgOut = new DatagramPacket(msg, msg.length, group, PORT);
-            System.out.println(new String(msg));
-            try {
-                socket.send(msgOut);
-                sleep(50);
-            } catch (IOException e) {
-                System.out.println("Erro I/O: " + e.getLocalizedMessage());
-            } catch (InterruptedException e) {
-                System.out.println("Erro InterruptedException: " + e.getLocalizedMessage());
-            }
-        }
-    }
 }

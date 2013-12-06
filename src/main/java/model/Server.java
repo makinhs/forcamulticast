@@ -91,6 +91,17 @@ public class Server {
         	else
         	{        	
 	            jogadorDaVez = jogadores.get(cont);
+	            if(jogadorDaVez == null)
+	            {
+	            	for(int i=jogadores.size()-1;i>=0; i--)
+	            	{
+	            		if(!(jogadores.get(i)==null))
+	            		{
+	            			jogadorDaVez = jogadores.get(i);
+	            			break;
+	            		}
+	            	}
+	            }
 	            cont++;
 	            if (cont == jogadores.size()) {
 	                cont = 0;
@@ -223,7 +234,7 @@ public class Server {
             //outro jogador para jogar, senão fechar o game...
             contJogadorVez++;
             System.out.println("timeout");
-//            if (contJogadorVez > 2) {
+            
                 
             	if(idContNaoJogou.containsKey(jogadorDaVez.getId()))
             	{
@@ -236,8 +247,11 @@ public class Server {
             				if(j.getId() == jogadorDaVez.getId())
             				{
             					jogadores.remove(j);
+            					
             				}
             			}
+            			
+            			jogadores.add(null);
             		}
             	}
             	else
@@ -317,11 +331,6 @@ public class Server {
     }
 
 
-    private void limparDados() {
-        palavraDaVez = getProximaPalavra();
-        palavraTentada = new ArrayList<String>();
-    }
-
     private String getProximaPalavra() {
         List<String> list = palavrasController.getPalavras();
         Collections.shuffle(list);
@@ -341,17 +350,6 @@ public class Server {
         return Parameter.HOST_ADDRESS;
     }
 
-    //        public void setChavesPublicas(ArrayList<PublicKey> chavesPublicas) {
-    //                this.chavesPublicas = chavesPublicas;
-    //        }
-
-    //        public void setChavesPrivadas(ArrayList<PrivateKey> chavesPrivadas) {
-    //                this.chavesPrivadas = chavesPrivadas;
-    //        }
-
-    //        public ArrayList<PublicKey> getChavesPublicas() {
-    //                return chavesPublicas;
-    //        }
 
     public ArrayList<Jogador> getJogadores() {
         return jogadores;
